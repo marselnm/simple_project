@@ -15,6 +15,7 @@
 #define CMD_TEST_SEVO_CONNECTION 0x48//Запуск тестов
 #define CMD_SET_SERVO_WORK_MODE 0x49//Настроить режим работы привода
 #define CMD_READ_STATUS 0x34//Прочитать статус
+#define CMD_CHANGE_NETPARAMS 0x05//Изменить настройки подключения
 
 #pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_set_position
@@ -121,6 +122,18 @@ typedef struct  __attribute__((packed)) cmd_read_status
     uint16_t Lenght;
     uint8_t Message_ID;
 } cmd_read_status_t;
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+typedef struct  __attribute__((packed)) cmd_change_netparams
+{
+    uint16_t Lenght;
+    uint8_t Message_ID;
+    uint32_t Gateway;
+    uint32_t Netmask;
+    uint32_t IPdevice;
+    uint8_t  RAMofFlash;
+} cmd_change_netparams_t;
 #pragma pack(pop)
 
 
