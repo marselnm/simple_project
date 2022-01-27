@@ -13,6 +13,16 @@ MainWindow::MainWindow(QWidget *parent) :
     HostAP.setAddress(ui->lineEdit->text());
     PortAP = static_cast<quint16>(ui->lineEdit_2->text().toInt());
 
+    //заполнение QComboBox для коррекции положения
+    ui->comboBox_cor_pos->addItem("AZ");
+    ui->comboBox_cor_pos->addItem("EL");
+    ui->comboBox_cor_pos->addItem("POL");
+
+    //заполнение QComboBox для настройки позиции парковки
+    ui->comboBox_park_pos->addItem("AZ");
+    ui->comboBox_park_pos->addItem("EL");
+    ui->comboBox_park_pos->addItem("POL");
+
     //заполнение QComboBox для реле
     ui->comboBox_relay->addItem("Реле 1");
     ui->comboBox_relay->addItem("Реле 2");
@@ -87,29 +97,27 @@ void MainWindow::on_pushButton_ret_az_el_clicked()
 
 void MainWindow::on_pushButton_set_dev_clicked()
 {
-    int device = -1;
-
     cmd_set_cntrl_dev_t cmd_set_cntrl_dev;
     cmd_set_cntrl_dev.Lenght = sizeof (cmd_set_cntrl_dev_t);
     cmd_set_cntrl_dev.Message_ID = CMD_SET_CNTRL_DEV;
+    cmd_set_cntrl_dev.Device_ID = -1;//устройство не задано
 
-    if(ui->checkBox->isChecked() && !ui->checkBox_2->isChecked())
+    if(ui->checkBox->isChecked())
     {
         cmd_set_cntrl_dev.Device_ID = 0x00;//от пульта
-        device = 0;
-    }else
-    {
-        if(!ui->checkBox->isChecked() && ui->checkBox_2->isChecked())
-        {
-            cmd_set_cntrl_dev.Device_ID = 0x01;//от ЭМВ
-            device = 1;
-        }else
-        {
-            qDebug() << "Устройство управления не определено";
-        }
     }
 
-    if(device != -1)//добавить проверку установки связи
+    if(ui->checkBox_2->isChecked())
+    {
+        cmd_set_cntrl_dev.Device_ID = 0x01;//от ЭМВ
+    }
+
+    if(cmd_set_cntrl_dev.Device_ID == -1)
+    {
+        qDebug() << "Устройство не выбрано";
+    }
+
+    if(cmd_set_cntrl_dev.Device_ID != -1 && 1)//добавить проверку установки связи
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_cntrl_dev), cmd_set_cntrl_dev.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_cntrl_dev),  cmd_set_cntrl_dev.Lenght);
@@ -163,80 +171,13 @@ void MainWindow::on_pushButton_new_pos_clicked()
     cmd_adjust_pos_sensor_t cmd_adjust_pos_sensor;
     cmd_adjust_pos_sensor.Lenght = sizeof (cmd_adjust_pos_sensor_t);
     cmd_adjust_pos_sensor.Message_ID = CMD_ADJUST_POS_SENSOR;
-    cmd_adjust_pos_sensor.Axis = 0;
-
-    if(ui->checkBox_6->isChecked())
-    {
-        cmd_adjust_pos_sensor.Axis = 0x01;
-    }
-
-    if(ui->checkBox_7->isChecked())
-    {
-        cmd_adjust_pos_sensor.Axis = 0x02;
-    }
-
-    if(ui->checkBox_8->isChecked())
-    {
-        cmd_adjust_pos_sensor.Axis = 0x03;
-    }
-
+    cmd_adjust_pos_sensor.Axis = static_cast<uint8_t>(ui->comboBox_cor_pos->currentIndex() + 1);
     cmd_adjust_pos_sensor.Position = ui->lineEdit_3->text().toFloat();
 
     if(1)//если связь была установлена
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_adjust_pos_sensor), cmd_adjust_pos_sensor.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_adjust_pos_sensor),  cmd_adjust_pos_sensor.Lenght);
-    }
-}
-
-void MainWindow::on_checkBox_6_stateChanged(int arg1)
-{
-    if(arg1 == 2)
-    {
-        ui->checkBox_7->setCheckState(Qt::Unchecked);
-        ui->checkBox_8->setCheckState(Qt::Unchecked);
-        ui->checkBox_7->setCheckable(false);
-        ui->checkBox_8->setCheckable(false);
-    }else
-    {
-        ui->checkBox_7->setCheckState(Qt::Unchecked);
-        ui->checkBox_8->setCheckState(Qt::Unchecked);
-        ui->checkBox_7->setCheckable(true);
-        ui->checkBox_8->setCheckable(true);
-    }
-}
-
-void MainWindow::on_checkBox_7_stateChanged(int arg1)
-{
-    if(arg1 == 2)
-    {
-        ui->checkBox_6->setCheckState(Qt::Unchecked);
-        ui->checkBox_8->setCheckState(Qt::Unchecked);
-        ui->checkBox_6->setCheckable(false);
-        ui->checkBox_8->setCheckable(false);
-    }else
-    {
-        ui->checkBox_6->setCheckState(Qt::Unchecked);
-        ui->checkBox_8->setCheckState(Qt::Unchecked);
-        ui->checkBox_6->setCheckable(true);
-        ui->checkBox_8->setCheckable(true);
-    }
-}
-
-void MainWindow::on_checkBox_8_stateChanged(int arg1)
-{
-    if(arg1 == 2)
-    {
-        ui->checkBox_6->setCheckState(Qt::Unchecked);
-        ui->checkBox_7->setCheckState(Qt::Unchecked);
-        ui->checkBox_6->setCheckable(false);
-        ui->checkBox_7->setCheckable(false);
-    }else
-    {
-        ui->checkBox_6->setCheckState(Qt::Unchecked);
-        ui->checkBox_7->setCheckState(Qt::Unchecked);
-        ui->checkBox_6->setCheckable(true);
-        ui->checkBox_7->setCheckable(true);
     }
 }
 
@@ -261,78 +202,12 @@ void MainWindow::on_pushButton_made_park_pos_clicked()
     cmd_adjust_park_position_t cmd_adjust_park_position;
     cmd_adjust_park_position.Lenght = sizeof (cmd_adjust_park_position_t);
     cmd_adjust_park_position.Message_ID = CMD_ADJUST_PARK_POSITION;
-    cmd_adjust_park_position.Axis = 0;
+    cmd_adjust_park_position.Axis = static_cast<uint8_t>(ui->comboBox_park_pos->currentIndex() + 1);
 
-    if(ui->checkBox_9->isChecked())
-    {
-        cmd_adjust_park_position.Axis = 0x01;
-    }
-
-    if(ui->checkBox_10->isChecked())
-    {
-        cmd_adjust_park_position.Axis = 0x02;
-    }
-
-    if(ui->checkBox_11->isChecked())
-    {
-        cmd_adjust_park_position.Axis = 0x03;
-    }
-
-    if(1 && cmd_adjust_park_position.Axis != 0)//если связь была установлена
+    if(1)//если связь была установлена
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_adjust_park_position), cmd_adjust_park_position.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_adjust_park_position),  cmd_adjust_park_position.Lenght);
-    }
-}
-
-void MainWindow::on_checkBox_9_stateChanged(int arg1)
-{
-    if(arg1 == 2)
-    {
-        ui->checkBox_10->setCheckState(Qt::Unchecked);
-        ui->checkBox_11->setCheckState(Qt::Unchecked);
-        ui->checkBox_10->setCheckable(false);
-        ui->checkBox_11->setCheckable(false);
-    }else
-    {
-        ui->checkBox_10->setCheckState(Qt::Unchecked);
-        ui->checkBox_11->setCheckState(Qt::Unchecked);
-        ui->checkBox_10->setCheckable(true);
-        ui->checkBox_11->setCheckable(true);
-    }
-}
-
-void MainWindow::on_checkBox_10_stateChanged(int arg1)
-{
-    if(arg1 == 2)
-    {
-        ui->checkBox_9->setCheckState(Qt::Unchecked);
-        ui->checkBox_11->setCheckState(Qt::Unchecked);
-        ui->checkBox_9->setCheckable(false);
-        ui->checkBox_11->setCheckable(false);
-    }else
-    {
-        ui->checkBox_9->setCheckState(Qt::Unchecked);
-        ui->checkBox_11->setCheckState(Qt::Unchecked);
-        ui->checkBox_9->setCheckable(true);
-        ui->checkBox_11->setCheckable(true);
-    }
-}
-
-void MainWindow::on_checkBox_11_stateChanged(int arg1)
-{
-    if(arg1 == 2)
-    {
-        ui->checkBox_9->setCheckState(Qt::Unchecked);
-        ui->checkBox_10->setCheckState(Qt::Unchecked);
-        ui->checkBox_9->setCheckable(false);
-        ui->checkBox_10->setCheckable(false);
-    }else
-    {
-        ui->checkBox_9->setCheckState(Qt::Unchecked);
-        ui->checkBox_10->setCheckState(Qt::Unchecked);
-        ui->checkBox_9->setCheckable(true);
-        ui->checkBox_10->setCheckable(true);
     }
 }
 
@@ -393,5 +268,31 @@ void MainWindow::on_pushButton_status_clicked()
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_read_status), cmd_read_status.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_read_status),  cmd_read_status.Lenght);
+    }
+}
+
+void MainWindow::on_checkBox_stateChanged(int arg1)
+{
+    if(arg1 == 2)
+    {
+        ui->checkBox_2->setCheckState(Qt::Unchecked);
+        ui->checkBox_2->setCheckable(false);
+    }else
+    {
+        ui->checkBox_2->setCheckState(Qt::Unchecked);
+        ui->checkBox_2->setCheckable(true);
+    }
+}
+
+void MainWindow::on_checkBox_2_stateChanged(int arg1)
+{
+    if(arg1 == 2)
+    {
+        ui->checkBox->setCheckState(Qt::Unchecked);
+        ui->checkBox->setCheckable(false);
+    }else
+    {
+        ui->checkBox->setCheckState(Qt::Unchecked);
+        ui->checkBox->setCheckable(true);
     }
 }

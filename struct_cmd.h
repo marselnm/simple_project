@@ -33,7 +33,7 @@ typedef struct  __attribute__((packed)) cmd_set_cntrl_dev
 {
     uint16_t Lenght;
     uint8_t Message_ID;
-    uint8_t Device_ID;
+    int8_t Device_ID;
 } cmd_set_cntrl_dev_t;
 #pragma pack(pop)
 
