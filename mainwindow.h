@@ -21,6 +21,7 @@ public:
     void PutCmdOnForm(char *data, int size);
     void PutAnsOnForm(char *data, int size);
     void IncCountCMD();
+    void IncCountANS();
 
 
 private slots:

@@ -108,6 +108,12 @@ void MainWindow::IncCountCMD()
     ui->label_24->setNum(CountCMD);
 }
 
+void MainWindow::IncCountANS()
+{
+    CountAns++;
+    ui->label_25->setNum(CountAns);
+}
+
 void MainWindow::on_pushButton_ret_az_el_clicked()
 {
     cmd_set_position_t cmd_set_position;

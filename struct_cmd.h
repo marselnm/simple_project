@@ -1,5 +1,5 @@
-#ifndef SCTRUCT_H
-#define SCTRUCT_H
+#ifndef SCTRUCT_CMD_H
+#define SCTRUCT_CMD_H
 
 #include "stdint.h"
 #include "string.h"
@@ -141,7 +141,7 @@ typedef struct  __attribute__((packed)) cmd_change_netparams
 #pragma pack(pop)
 
 
-#endif // SCTRUCT_H
+#endif // SCTRUCT_CMD_H
 
 
 
