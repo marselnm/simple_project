@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     CountAns = 0;
     Connect = 0;//соединение не было установлено
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:red;}");
-    ui->lineEdit->setText("10.0.0.74");//ip-по умолчанию
+    ui->lineEdit->setText("127.0.0.1");//ip-по умолчанию
     ui->lineEdit_2->setText("10000");//порт согласно универсальному протоколу
 
     opu_socket = new QUdpSocket();
@@ -411,4 +411,9 @@ void MainWindow::on_pushButton_connect_clicked()
 
     Connect = 1;
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:green;}");
+}
+
+void MainWindow::on_pushButton_clean_answ_clicked()
+{
+    ui->textEdit_2->clear();
 }

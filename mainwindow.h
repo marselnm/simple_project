@@ -62,6 +62,8 @@ private slots:
 
     void on_pushButton_connect_clicked();
 
+    void on_pushButton_clean_answ_clicked();
+
 private:
     Ui::MainWindow *ui;
     QUdpSocket *opu_socket;
