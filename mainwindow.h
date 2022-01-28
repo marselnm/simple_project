@@ -19,7 +19,9 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void PutCmdOnForm(char *data, int size);
+    void PutAnsOnForm(char *data, int size);
     void IncCountCMD();
+
 
 private slots:
     void on_pushButton_ret_az_el_clicked();
@@ -63,6 +65,8 @@ private slots:
     void on_pushButton_connect_clicked();
 
     void on_pushButton_clean_answ_clicked();
+
+    void receive_message_from_opu();
 
 private:
     Ui::MainWindow *ui;

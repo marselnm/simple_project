@@ -13,9 +13,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEdit->setText("127.0.0.1");//ip-по умолчанию
     ui->lineEdit_2->setText("10000");//порт согласно универсальному протоколу
 
-    opu_socket = new QUdpSocket();
     HostAP.setAddress(ui->lineEdit->text());
     PortAP = static_cast<quint16>(ui->lineEdit_2->text().toInt());
+
+    opu_socket = new QUdpSocket();
+    opu_socket->bind(HostAP, PortAP);
+    connect(opu_socket, &QUdpSocket::readyRead, this, &MainWindow::receive_message_from_opu);
 
     //заполнение QComboBox для коррекции положения
     ui->comboBox_cor_pos->addItem("AZ");
@@ -84,6 +87,19 @@ void MainWindow::PutCmdOnForm(char *data, int size)
     }
     temp.append("\n");
     ui->textEdit->insertPlainText(temp);
+}
+
+void MainWindow::PutAnsOnForm(char *data, int size)
+{
+    QString temp;
+    for(int i = 0; i < size; i++)
+    {
+        temp.append("0x");
+        temp.append(QString::number(*(data+i) & 0xFF, 16));
+        temp.append(" ");
+    }
+    temp.append("\n");
+    ui->textEdit_2->insertPlainText(temp);
 }
 
 void MainWindow::IncCountCMD()
@@ -417,3 +433,24 @@ void MainWindow::on_pushButton_clean_answ_clicked()
 {
     ui->textEdit_2->clear();
 }
+
+void MainWindow::receive_message_from_opu()
+{
+    QByteArray Buffer;
+    Buffer.clear();
+    Buffer.resize(static_cast<int>(opu_socket->pendingDatagramSize()));
+    opu_socket->readDatagram(Buffer.data(), Buffer.size());
+    PutAnsOnForm(Buffer.data(),  Buffer.size());
+
+    int f = 0;
+    ++f;
+}
+
+
+
+
+
+
+
+
+
