@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1418</width>
-    <height>943</height>
+    <width>1420</width>
+    <height>940</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1420</width>
+    <height>940</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1420</width>
+    <height>940</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Управление ОПУ (НАП-С/Кu)</string>
@@ -1079,14 +1091,14 @@
              <item>
               <widget class="QLabel" name="label_22">
                <property name="text">
-                <string>TextLabel</string>
+                <string>Счетчик команд:</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QLabel" name="label_24">
                <property name="text">
-                <string>TextLabel</string>
+                <string>0</string>
                </property>
               </widget>
              </item>
@@ -1122,14 +1134,14 @@
              <item>
               <widget class="QLabel" name="label_23">
                <property name="text">
-                <string>TextLabel</string>
+                <string>Счетчик ответов:</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QLabel" name="label_25">
                <property name="text">
-                <string>TextLabel</string>
+                <string>0</string>
                </property>
               </widget>
              </item>
@@ -1149,7 +1161,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1418</width>
+     <width>1420</width>
      <height>22</height>
     </rect>
    </property>

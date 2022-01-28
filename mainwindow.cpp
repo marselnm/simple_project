@@ -6,6 +6,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    CountCMD = 0;
+    CountAns = 0;
+    Connect = 0;//соединение не было установлено
+    ui->pushButton_connect->setStyleSheet("QPushButton{background-color:red;}");
     ui->lineEdit->setText("10.0.0.74");//ip-по умолчанию
     ui->lineEdit_2->setText("10000");//порт согласно универсальному протоколу
 
@@ -58,6 +62,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBox_complate->addItem("Вкл");
     ui->comboBox_brake_auto->addItem("Выкл");
     ui->comboBox_brake_auto->addItem("Вкл");
+
+    //заполнение QComboBox для записи настроек сети
+    ui->comboBox_ram_or_flash->addItem("ПЗУ");
+    ui->comboBox_ram_or_flash->addItem("ОЗУ");
 }
 
 MainWindow::~MainWindow()
@@ -78,6 +86,12 @@ void MainWindow::PutCmdOnForm(char *data, int size)
     ui->textEdit->insertPlainText(temp);
 }
 
+void MainWindow::IncCountCMD()
+{
+    CountCMD++;
+    ui->label_24->setNum(CountCMD);
+}
+
 void MainWindow::on_pushButton_ret_az_el_clicked()
 {
     cmd_set_position_t cmd_set_position;
@@ -92,6 +106,7 @@ void MainWindow::on_pushButton_ret_az_el_clicked()
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_position), cmd_set_position.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_position),  cmd_set_position.Lenght);
+        IncCountCMD();
     }
 }
 
@@ -121,19 +136,21 @@ void MainWindow::on_pushButton_set_dev_clicked()
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_cntrl_dev), cmd_set_cntrl_dev.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_cntrl_dev),  cmd_set_cntrl_dev.Lenght);
+        IncCountCMD();
     }
 }
 
 void MainWindow::on_pushButton_reset_dev_clicked()
 {
-    cmd_reset_dev_t cmd_reset_dev;
-    cmd_reset_dev.Lenght = sizeof (cmd_reset_dev_t);
-    cmd_reset_dev.Message_ID = CMD_RESET_DEV;
+    cmd_simple_t cmd_simple;
+    cmd_simple.Lenght = sizeof (cmd_simple_t);
+    cmd_simple.Message_ID = CMD_RESET_DEV;
 
     if(1)//если связь была установлена
     {
-        opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_reset_dev), cmd_reset_dev.Lenght, HostAP, PortAP);
-        PutCmdOnForm(reinterpret_cast<char*>(&cmd_reset_dev),  cmd_reset_dev.Lenght);
+        opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_simple), cmd_simple.Lenght, HostAP, PortAP);
+        PutCmdOnForm(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
+        IncCountCMD();
     }
 }
 
@@ -159,10 +176,11 @@ void MainWindow::on_pushButton_stop_clicked()
         cmd_stop_moving.Mask = cmd_stop_moving.Mask | 0x01 << 2;//установить соответствующую маску
     }
 
-    if(1)//если связь была установлена
+    if(1 && cmd_stop_moving.Mask != 0)//если связь была установлена
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_stop_moving), cmd_stop_moving.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_stop_moving),  cmd_stop_moving.Lenght);
+        IncCountCMD();
     }
 }
 
@@ -178,6 +196,7 @@ void MainWindow::on_pushButton_new_pos_clicked()
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_adjust_pos_sensor), cmd_adjust_pos_sensor.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_adjust_pos_sensor),  cmd_adjust_pos_sensor.Lenght);
+        IncCountCMD();
     }
 }
 
@@ -193,6 +212,7 @@ void MainWindow::on_pushButton_move_park_clicked()
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_move_park_position), cmd_move_park_position.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_move_park_position),  cmd_move_park_position.Lenght);
+        IncCountCMD();
     }
 }
 
@@ -208,6 +228,7 @@ void MainWindow::on_pushButton_made_park_pos_clicked()
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_adjust_park_position), cmd_adjust_park_position.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_adjust_park_position),  cmd_adjust_park_position.Lenght);
+        IncCountCMD();
     }
 }
 
@@ -223,6 +244,7 @@ void MainWindow::on_pushButton_relay_clicked()
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_relay_state), cmd_set_relay_state.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_relay_state),  cmd_set_relay_state.Lenght);
+        IncCountCMD();
     }
 }
 
@@ -237,6 +259,7 @@ void MainWindow::on_pushButton_test_clicked()
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_test_sevo_connection), cmd_test_sevo_connection.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_test_sevo_connection),  cmd_test_sevo_connection.Lenght);
+        IncCountCMD();
     }
 }
 
@@ -255,6 +278,7 @@ void MainWindow::on_pushButton_set_servo_mode_clicked()
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_servo_work_mode), cmd_set_servo_work_mode.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_servo_work_mode),  cmd_set_servo_work_mode.Lenght);
+        IncCountCMD();
     }
 }
 
@@ -268,6 +292,7 @@ void MainWindow::on_pushButton_status_clicked()
     {
         opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_read_status), cmd_read_status.Lenght, HostAP, PortAP);
         PutCmdOnForm(reinterpret_cast<char*>(&cmd_read_status),  cmd_read_status.Lenght);
+        IncCountCMD();
     }
 }
 
@@ -295,4 +320,95 @@ void MainWindow::on_checkBox_2_stateChanged(int arg1)
         ui->checkBox->setCheckState(Qt::Unchecked);
         ui->checkBox->setCheckable(true);
     }
+}
+
+void MainWindow::on_pushButton_check_link_clicked()
+{
+    cmd_simple_t cmd_simple;
+    cmd_simple.Lenght = sizeof (cmd_simple_t);
+    cmd_simple.Message_ID = CMD_CHECK_LINK;
+    opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_simple), cmd_simple.Lenght, HostAP, PortAP);
+    PutCmdOnForm(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
+    IncCountCMD();
+}
+
+void MainWindow::on_pushButton_clean_cmd_clicked()
+{
+    ui->textEdit->clear();
+}
+
+void MainWindow::on_pushButton_get_dev_info_clicked()
+{
+    cmd_simple_t cmd_simple;
+    cmd_simple.Lenght = sizeof (cmd_simple_t);
+    cmd_simple.Message_ID = CMD_GET_DEVICE_INFO;
+
+    if(1)
+    {
+        opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_simple), cmd_simple.Lenght, HostAP, PortAP);
+        PutCmdOnForm(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
+        IncCountCMD();
+    }
+}
+
+void MainWindow::on_pushButton_get_mac_clicked()
+{
+    cmd_simple_t cmd_simple;
+    cmd_simple.Lenght = sizeof (cmd_simple_t);
+    cmd_simple.Message_ID = CMD_GET_MAC_ADDRESS;
+
+    if(1)
+    {
+        opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_simple), cmd_simple.Lenght, HostAP, PortAP);
+        PutCmdOnForm(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
+        IncCountCMD();
+    }
+}
+
+void MainWindow::on_pushButton_get_netparam_clicked()
+{
+    cmd_simple_t cmd_simple;
+    cmd_simple.Lenght = sizeof (cmd_simple_t);
+    cmd_simple.Message_ID = CMD_GET_NETPARAMS;
+
+    if(1)
+    {
+        opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_simple), cmd_simple.Lenght, HostAP, PortAP);
+        PutCmdOnForm(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
+        IncCountCMD();
+    }
+}
+
+void MainWindow::on_pushButton_change_netparam_clicked()
+{
+    cmd_change_netparams_t cmd_change_netparams;
+    cmd_change_netparams.Lenght = sizeof (cmd_change_netparams_t);
+    cmd_change_netparams.Message_ID = CMD_CHANGE_NETPARAMS;
+    cmd_change_netparams.Gateway = QHostAddress(ui->lineEdit_11->text()).toIPv4Address();
+    cmd_change_netparams.Netmask = QHostAddress(ui->lineEdit_12->text()).toIPv4Address();
+    cmd_change_netparams.IPdevice = QHostAddress(ui->lineEdit_13->text()).toIPv4Address();
+
+    if(ui->comboBox_ram_or_flash->currentIndex() == 0)
+    {
+        cmd_change_netparams.RAMofFlash = 0x00;
+    }else
+    {
+        cmd_change_netparams.RAMofFlash = 0xFF;
+    }
+
+    if(1)
+    {
+        opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_change_netparams), cmd_change_netparams.Lenght, HostAP, PortAP);
+        PutCmdOnForm(reinterpret_cast<char*>(&cmd_change_netparams),  cmd_change_netparams.Lenght);
+        IncCountCMD();
+    }
+}
+
+void MainWindow::on_pushButton_connect_clicked()
+{
+    HostAP.setAddress(ui->lineEdit->text());
+    PortAP = static_cast<quint16>(ui->lineEdit_2->text().toInt());
+
+    Connect = 1;
+    ui->pushButton_connect->setStyleSheet("QPushButton{background-color:green;}");
 }
