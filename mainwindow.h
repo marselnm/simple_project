@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QUdpSocket>
 #include <QDebug>
+#include <QTimer>
 
 #include "struct_cmd.h"
 
@@ -23,6 +24,7 @@ public:
     void IncCountCMD();
     void IncCountANS();
     void ShowCmdAnsStatus(cmd_ans_status_t *cmd_ans_status);
+    void ShowCmdAnsNetparams(cmd_ans_netparams_t *cmd_ans_netparams);
 
 
 private slots:
@@ -70,6 +72,12 @@ private slots:
 
     void receive_message_from_opu();
 
+    void on_pushButton_clean_edit_clicked();
+
+    void on_checkBox_6_stateChanged(int arg1);
+
+    void SendCmdReadStatusAuto();
+
 private:
     Ui::MainWindow *ui;
     QUdpSocket *opu_socket;
@@ -79,6 +87,8 @@ private:
     int CountAns;
     int Connect;
     cmd_ans_status_t cmd_ans_status;
+    QTimer *timeupdate;
+    cmd_ans_netparams_t cmd_ans_netparams;
 };
 
 #endif // MAINWINDOW_H

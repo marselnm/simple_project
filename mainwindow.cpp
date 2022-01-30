@@ -69,6 +69,11 @@ MainWindow::MainWindow(QWidget *parent) :
     //заполнение QComboBox для записи настроек сети
     ui->comboBox_ram_or_flash->addItem("ПЗУ");
     ui->comboBox_ram_or_flash->addItem("ОЗУ");
+
+    //настройка таймера для обнослений
+    timeupdate = new QTimer();
+    timeupdate->setInterval(1000);
+    connect(timeupdate, &QTimer::timeout, this, &MainWindow::SendCmdReadStatusAuto);
 }
 
 MainWindow::~MainWindow()
@@ -328,6 +333,16 @@ void MainWindow::ShowCmdAnsStatus(cmd_ans_status_t *cmd_ans_status)
 
 
     ui->textEdit_3->setText(message_status);
+}
+
+void MainWindow::ShowCmdAnsNetparams(cmd_ans_netparams_t *cmd_ans_netparams)
+{
+    QString message_netparams;
+    message_netparams.append("Сетевые параметры:\n");
+    message_netparams.append("Адрес шлюза: " + QHostAddress(cmd_ans_netparams->Gateway).toString() + "\n");
+    message_netparams.append("Макска подсети: " + QHostAddress(cmd_ans_netparams->Netmask).toString() + "\n");
+    message_netparams.append("IP-адрес: " + QHostAddress(cmd_ans_netparams->IPdevice).toString());
+    ui->textEdit_3->setText(message_netparams);
 }
 
 void MainWindow::on_pushButton_ret_az_el_clicked()
@@ -676,14 +691,44 @@ void MainWindow::receive_message_from_opu()
             }
             break;
         }
+        case (static_cast<char>(CMD_ANS_NETPARAMS)):
+        {
+            if(Buffer.size() == sizeof(cmd_ans_netparams_t))
+            {
+                memcpy(reinterpret_cast<char*>(&cmd_ans_netparams), Buffer.data(), sizeof(cmd_ans_netparams));
+                ShowCmdAnsNetparams(&cmd_ans_netparams);
+            }
+            break;
+        }
     }
 }
 
+void MainWindow::on_pushButton_clean_edit_clicked()
+{
+    ui->textEdit_3->clear();
+}
 
+void MainWindow::on_checkBox_6_stateChanged(int arg1)
+{
+    if(arg1 == 2)
+    {
+        timeupdate->start();
+    }else
+    {
+        timeupdate->stop();
+    }
+}
 
+void MainWindow::SendCmdReadStatusAuto()
+{
+    cmd_read_status_t cmd_read_status;
+    cmd_read_status.Lenght = sizeof (cmd_read_status_t);
+    cmd_read_status.Message_ID = CMD_READ_STATUS;
 
-
-
-
-
-
+    if(1)//если связь была установлена
+    {
+        opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_read_status), cmd_read_status.Lenght, HostAP, PortAP);
+        PutCmdOnForm(reinterpret_cast<char*>(&cmd_read_status),  cmd_read_status.Lenght);
+        IncCountCMD();
+    }
+}

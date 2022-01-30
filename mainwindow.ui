@@ -130,7 +130,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -1038,6 +1038,20 @@
             <widget class="QLabel" name="label_17">
              <property name="text">
               <string>Информация от ОПУ</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBox_6">
+             <property name="text">
+              <string>Автообновление</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_clean_edit">
+             <property name="text">
+              <string>Очистить поле</string>
              </property>
             </widget>
            </item>
