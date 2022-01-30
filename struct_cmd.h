@@ -20,6 +20,7 @@
 #define CMD_GET_DEVICE_INFO 0x06//Проверка связи (пинг)
 #define CMD_GET_MAC_ADDRESS 0x02//Получить MAC-адрес устройства
 #define CMD_GET_NETPARAMS 0x04//Получить настройки сети
+#define CMD_ANS_STATUS 0x8A//Идентификатор ответа на команду CMD_READ_STATUS
 
 #pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_set_position
@@ -138,6 +139,66 @@ typedef struct  __attribute__((packed)) cmd_change_netparams
     uint32_t IPdevice;
     uint8_t  RAMofFlash;
 } cmd_change_netparams_t;
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+typedef struct  __attribute__((packed)) cmd_ans_status
+{
+    uint16_t Lenght;
+    uint8_t Message_ID;
+    int8_t Device_ID;
+    int8_t Temperaure;
+    uint8_t StateRelay1;
+    uint8_t StateRelay2;
+    uint8_t hour;
+    uint8_t min;
+    uint8_t sec;
+    float CurrentAZ;
+    float SetAZ;
+    float ParkAZ;
+    uint8_t StateDriveAZ;
+    uint8_t EndSwitchesAZ;
+    uint8_t ConnectAZ;
+    int8_t TemperatureAZ;
+    uint8_t ErrosCodeAZ;
+    uint8_t SignalAZ;
+    float ErrorAZ;
+    float SpeedAZ;
+    uint8_t DiriveModeAZ;
+    uint8_t CountCmdSendDrAZ;
+    uint8_t CountErrorAnsDrAZ;
+    uint8_t CountMissedAnsDrAZ;
+    float CurrentEL;
+    float SetEL;
+    float ParkEL;
+    uint8_t StateDriveEL;
+    uint8_t EndSwitchesEL;
+    uint8_t ConnectEL;
+    int8_t TemperatureEL;
+    uint8_t ErrosCodeEL;
+    uint8_t SignalEL;
+    float ErrorEL;
+    float SpeedEL;
+    uint8_t DiriveModeEL;
+    uint8_t CountCmdSendDrEL;
+    uint8_t CountErrorAnsDrEL;
+    uint8_t CountMissedAnsDrEL;
+    float CurrentPOL;
+    float SetPOL;
+    float ParkPOL;
+    uint8_t StateDrivePOL;
+    uint8_t EndSwitchesPOL;
+    uint8_t ConnectPOL;
+    int8_t TemperaturePOL;
+    uint8_t ErrosCodePOL;
+    uint8_t SignalPOL;
+    float ErrorPOL;
+    float SpeedPOL;
+    uint8_t DiriveModePOL;
+    uint8_t CountCmdSendDrPOL;
+    uint8_t CountErrorAnsDrPOL;
+    uint8_t CountMissedAnsDrPOL;
+} cmd_ans_status_t;
 #pragma pack(pop)
 
 

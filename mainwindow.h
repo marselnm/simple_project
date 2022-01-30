@@ -22,6 +22,7 @@ public:
     void PutAnsOnForm(char *data, int size);
     void IncCountCMD();
     void IncCountANS();
+    void ShowCmdAnsStatus(cmd_ans_status_t *cmd_ans_status);
 
 
 private slots:
@@ -77,6 +78,7 @@ private:
     int CountCMD;
     int CountAns;
     int Connect;
+    cmd_ans_status_t cmd_ans_status;
 };
 
 #endif // MAINWINDOW_H
