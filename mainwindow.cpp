@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     CountAns = 0;
     Connect = 0;//соединение не было установлено
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:red;}");
-    ui->lineEdit->setText("127.0.0.1");//ip-по умолчанию
+    ui->lineEdit->setText("192.168.1.12");//ip-по умолчанию
     ui->lineEdit_2->setText("10000");//порт согласно универсальному протоколу
 
     HostAP.setAddress(ui->lineEdit->text());
