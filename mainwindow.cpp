@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     CountAns = 0;
     Connect = 0;//соединение не было установлено
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:red;}");
-    ui->lineEdit->setText("192.168.1.12");//ip-по умолчанию
+    ui->lineEdit->setText("127.0.0.1");//ip-по умолчанию
     ui->lineEdit_2->setText("10000");//порт согласно универсальному протоколу
 
     HostAP.setAddress(ui->lineEdit->text());
@@ -123,44 +123,27 @@ void MainWindow::ShowCmdAnsStatus(cmd_ans_status_t *cmd_ans_status)
 {
     QString message_status;
 
-    message_status.append("Управ. уст-во: ");
+    message_status.append("<b>Управ. уст-во:</b> ");
 
-    if(cmd_ans_status->Device_ID == 0x00)
-    {
-        message_status.append("пульт ");
-    }else
-    {
-        message_status.append("ЭВМ ");
-    }
+    QString value = cmd_ans_status->Device_ID ? "ЭВМ  " : "пульт  ";
+    message_status.append(value);
 
-    message_status.append("Темп: " + QString::number(cmd_ans_status->Temperaure) + " град ");
-    message_status.append("Время работы: " + QString::number(cmd_ans_status->hour) + ":" + QString::number(cmd_ans_status->min) + ":" + QString::number(cmd_ans_status->sec) + " ");
+    message_status.append("<b>Темп:</b> " + QString::number(cmd_ans_status->Temperaure) + " град  ");
+    message_status.append("<b>Время работы:</b> " + QString::number(cmd_ans_status->hour) + ":" +
+                          QString::number(cmd_ans_status->min) + ":" + QString::number(cmd_ans_status->sec) + " ");
 
-    message_status.append("Реле 1: ");
+    message_status.append("<br><b>Реле 1:</b> ");
+    value = cmd_ans_status->StateRelay1 ? "Вкл  " : "Выкл  ";
+    message_status.append(value);
 
-    if(cmd_ans_status->StateRelay1 == 0x00)
-    {
-        message_status.append("Выкл ");
-    }else
-    {
-        message_status.append("Вкл ");
-    }
+    message_status.append("<b>Реле 2:</b> ");
+    value = cmd_ans_status->StateRelay2 ? "Вкл  " : "Выкл  ";
+    message_status.append(value);
 
-    message_status.append("Реле 2: ");
-
-    if(cmd_ans_status->StateRelay2 == 0x00)
-    {
-        message_status.append("Выкл");
-    }else
-    {
-        message_status.append("Вкл");
-    }
-
-    message_status.append("\n\n");
-    message_status.append("Азимут текущий: " + QString::number(static_cast<double>(cmd_ans_status->CurrentAZ)) + " ");
-    message_status.append("Заданный: " + QString::number(static_cast<double>(cmd_ans_status->SetAZ)) + " ");
-    message_status.append("Парковочный: " + QString::number(static_cast<double>(cmd_ans_status->ParkAZ)) + " ");
-    message_status.append("Состояние: ");
+    message_status.append("<br><br><b>Азимут текущий:</b> " + QString::number(static_cast<double>(cmd_ans_status->CurrentAZ)) + " ");
+    message_status.append("<b>Заданный:</b> " + QString::number(static_cast<double>(cmd_ans_status->SetAZ)) + " ");
+    message_status.append("<b>Парковочный:</b> " + QString::number(static_cast<double>(cmd_ans_status->ParkAZ)) + " ");
+    message_status.append("<br><b>Состояние:</b> ");
 
     switch (cmd_ans_status->StateDriveAZ)
     {
@@ -180,11 +163,11 @@ void MainWindow::ShowCmdAnsStatus(cmd_ans_status_t *cmd_ans_status)
             break;
         }
     }
-    message_status.append("\n\n");
-    message_status.append("Угол места текущий: " + QString::number(static_cast<double>(cmd_ans_status->CurrentEL)) + " ");
-    message_status.append("Заданный: " + QString::number(static_cast<double>(cmd_ans_status->SetEL)) + " ");
-    message_status.append("Парковочный: " + QString::number(static_cast<double>(cmd_ans_status->ParkEL)) + " ");
-    message_status.append("Состояние: ");
+
+    message_status.append("<br><br><b>Угол места текущий:</b> " + QString::number(static_cast<double>(cmd_ans_status->CurrentEL)) + " ");
+    message_status.append("<b>Заданный:</b> " + QString::number(static_cast<double>(cmd_ans_status->SetEL)) + " ");
+    message_status.append("<b>Парковочный:</b> " + QString::number(static_cast<double>(cmd_ans_status->ParkEL)) + " ");
+    message_status.append("<br><b>Состояние:</b> ");
 
     switch (cmd_ans_status->StateDriveEL)
     {
@@ -205,32 +188,83 @@ void MainWindow::ShowCmdAnsStatus(cmd_ans_status_t *cmd_ans_status)
         }
     }
 
-    message_status.append("\n\n");
-    message_status.append("Концевики AZ: ");
+
+    message_status.append("<br><br><b>Концевики AZ:</b> ");
 
     int KVOaz = (cmd_ans_status->EndSwitchesAZ >> 0) & 0x01;
-    message_status.append("КВО:" + QString::number(KVOaz) + " ");
-    int KVPaz = (cmd_ans_status->EndSwitchesAZ >> 1) & 0x01;
-    message_status.append("КВП:" + QString::number(KVPaz) + " ");
-    int KVRaz = (cmd_ans_status->EndSwitchesAZ >> 2) & 0x01;
-    message_status.append("КВР:" + QString::number(KVRaz));
+    if(KVOaz){
+        message_status.append("КВO:" + QString::number(KVOaz) + " ");
+    }else {
+        message_status.append("КВО:<font color='red'>" + QString::number(KVOaz) + "</font>" + " ");
+    }
 
-    message_status.append("\n");
-    message_status.append("Привод AZ: ");
+    int KVPaz = (cmd_ans_status->EndSwitchesAZ >> 1) & 0x01;
+    if(KVPaz){
+        message_status.append("КВП:" + QString::number(KVPaz) + " ");
+    }else {
+        message_status.append("КВП:<font color='red'>" + QString::number(KVPaz) + "</font>" + " ");
+    }
+
+    int KVRaz = (cmd_ans_status->EndSwitchesAZ >> 2) & 0x01;
+    if(KVRaz){
+        message_status.append("КВР:" + QString::number(KVRaz) + " ");
+    }else {
+        message_status.append("КВР:<font color='red'>" + QString::number(KVRaz) + "</font>" + " ");
+    }
+
+
+    message_status.append("<b>Концевики EL:</b> ");
+    int KVOel = (cmd_ans_status->EndSwitchesEL >> 0) & 0x01;
+    if(KVOel){
+        message_status.append("КВO:" + QString::number(KVOel) + " ");
+    }else {
+        message_status.append("КВО:<font color='red'>" + QString::number(KVOel) + "</font>" + " ");
+    }
+
+    int KVPel = (cmd_ans_status->EndSwitchesEL >> 1) & 0x01;
+    if(KVPel){
+        message_status.append("КВП:" + QString::number(KVPel) + " ");
+    }else {
+        message_status.append("КВП:<font color='red'>" + QString::number(KVPel) + "</font>" + " ");
+    }
+
+    int KVRel = (cmd_ans_status->EndSwitchesEL >> 2) & 0x01;
+    if(KVRel){
+        message_status.append("КВР:" + QString::number(KVRel) + " ");
+    }else {
+        message_status.append("КВР:<font color='red'>" + QString::number(KVRel) + "</font>" + " ");
+    }
+
+    message_status.append("<br><b>Привод AZ:</b> ");
 
     if(cmd_ans_status->ConnectAZ == 0x01)
+    {
+        message_status.append("Подкл. ");
+    }else
+    {
+        message_status.append("<font color='red'>Нет связи</font> ");
+    }
+
+    message_status.append("<b>Привод EL:</b> ");
+
+    if(cmd_ans_status->ConnectEL == 0x01)
     {
         message_status.append("Подкл.");
     }else
     {
-        message_status.append("Нет связи");
+        message_status.append("<font color='red'>Нет связи</font>");
     }
-    message_status.append("\n");
-    message_status.append("Темп. AZ: " + QString::number(cmd_ans_status->TemperatureAZ));
-    message_status.append("\n");
-    message_status.append("Код ошибки:" + QString::number(cmd_ans_status->ErrosCodeAZ));
-    message_status.append("\n");
-    message_status.append("Сигналы привода AZ: ");
+
+    message_status.append("<br><br><b>Темп. AZ:</b> " + QString::number(cmd_ans_status->TemperatureAZ) + " град ");
+    message_status.append("<b>Темп. EL:</b> " + QString::number(cmd_ans_status->TemperatureEL) + " град ");
+
+    message_status.append("<br><b>Скорость AZ:</b> " + QString::number(static_cast<double>(cmd_ans_status->SpeedAZ)) + " ");
+    message_status.append("<b>Скорость EL:</b> " + QString::number(static_cast<double>(cmd_ans_status->SpeedEL)));
+
+    message_status.append("<br><br><b>Код ошибки AZ:</b> 0x" + QString::number(cmd_ans_status->ErrosCodeAZ & 0xFF, 16) + " ");
+    message_status.append("<b>Код ошибки EL:</b> 0x" + QString::number(cmd_ans_status->ErrosCodeEL & 0xFF, 16));
+
+    message_status.append("<br><b>Сигналы привода AZ:</b> ");
     int SONaz = (cmd_ans_status->SignalAZ >> 0) & 0x01;
     message_status.append("SON:" + QString::number(SONaz) + " ");
     int LSNaz = (cmd_ans_status->SignalAZ >> 1) & 0x01;
@@ -248,51 +282,7 @@ void MainWindow::ShowCmdAnsStatus(cmd_ans_status_t *cmd_ans_status)
     int PEDaz = (cmd_ans_status->SignalAZ >> 7) & 0x01;
     message_status.append("PED:" + QString::number(PEDaz));
 
-    message_status.append("\n");
-    message_status.append("Допустимая ошибка AZ: " + QString::number(static_cast<double>(cmd_ans_status->ErrorAZ)));
-    message_status.append("\n");
-    message_status.append("Скорость AZ: " + QString::number(static_cast<double>(cmd_ans_status->SpeedAZ)));
-    message_status.append("\n");
-    message_status.append("Режим двигателя AZ: ");
-
-    if(cmd_ans_status->DiriveModeAZ == 0x01)
-    {
-        message_status.append("FLAG_Brake");
-    }else
-    {
-        message_status.append("FLAG_Complete");
-    }
-    message_status.append("\n");
-    message_status.append("Отправленные команды: " + QString::number(static_cast<double>(cmd_ans_status->CountCmdSendDrAZ)) + " ");
-    message_status.append("Ошибочные ответы: " + QString::number(static_cast<double>(cmd_ans_status->CountErrorAnsDrAZ)) + " ");
-    message_status.append("Пропущенные ответы: " + QString::number(static_cast<double>(cmd_ans_status->CountMissedAnsDrAZ)));
-    message_status.append("\n");
-    message_status.append("\n");
-
-    message_status.append("Концевики EL: ");
-    int KVOel = (cmd_ans_status->EndSwitchesEL >> 0) & 0x01;
-    message_status.append("КВО:" + QString::number(KVOel) + " ");
-    int KVPel = (cmd_ans_status->EndSwitchesEL >> 1) & 0x01;
-    message_status.append("КВП:" + QString::number(KVPel) + " ");
-    int KVRel = (cmd_ans_status->EndSwitchesEL >> 2) & 0x01;
-    message_status.append("КВР:" + QString::number(KVRel));
-
-    message_status.append("\n");
-    message_status.append("Привод EL: ");
-
-    if(cmd_ans_status->ConnectEL == 0x01)
-    {
-        message_status.append("Подкл.");
-    }else
-    {
-        message_status.append("Нет связи");
-    }
-    message_status.append("\n");
-    message_status.append("Темп. EL: " + QString::number(cmd_ans_status->TemperatureEL));
-    message_status.append("\n");
-    message_status.append("Код ошибки:" + QString::number(cmd_ans_status->ErrosCodeEL));
-    message_status.append("\n");
-    message_status.append("Сигналы привода EL: ");
+    message_status.append("<br><b>Сигналы привода EL:</b> ");
     int SONel = (cmd_ans_status->SignalEL >> 0) & 0x01;
     message_status.append("SON:" + QString::number(SONel) + " ");
     int LSNel = (cmd_ans_status->SignalEL >> 1) & 0x01;
@@ -310,27 +300,24 @@ void MainWindow::ShowCmdAnsStatus(cmd_ans_status_t *cmd_ans_status)
     int PEDel = (cmd_ans_status->SignalEL >> 7) & 0x01;
     message_status.append("PED:" + QString::number(PEDel));
 
-    message_status.append("\n");
-    message_status.append("Допустимая ошибка EL: " + QString::number(static_cast<double>(cmd_ans_status->ErrorEL)));
-    message_status.append("\n");
-    message_status.append("Скорость EL: " + QString::number(static_cast<double>(cmd_ans_status->SpeedEL)));
-    message_status.append("\n");
-    message_status.append("Режим двигателя EL: ");
+    message_status.append("<br><b>Допустимая ошибка AZ:</b> " + QString::number(static_cast<double>(cmd_ans_status->ErrorAZ)));
+    message_status.append("<br><b>Допустимая ошибка EL:</b> " + QString::number(static_cast<double>(cmd_ans_status->ErrorEL)));
 
-    if(cmd_ans_status->DiriveModeEL == 0x01)
-    {
-        message_status.append("FLAG_Brake");
-    }else
-    {
-        message_status.append("FLAG_Complete");
-    }
-    message_status.append("\n");
-    message_status.append("Отправленные команды: " + QString::number(static_cast<double>(cmd_ans_status->CountCmdSendDrEL)) + " ");
-    message_status.append("Ошибочные ответы: " + QString::number(static_cast<double>(cmd_ans_status->CountErrorAnsDrEL)) + " ");
-    message_status.append("Пропущенные ответы: " + QString::number(static_cast<double>(cmd_ans_status->CountMissedAnsDrEL)));
-    message_status.append("\n");
-    message_status.append("\n");
+    message_status.append("<br><b>Режим двигателя AZ:</b> ");
+    value = cmd_ans_status->DiriveModeAZ ? "FLAG_Brake" : "FLAG_Complete";
+    message_status.append(value);
 
+    message_status.append("<br><b>Режим двигателя EL:</b> ");
+    value = cmd_ans_status->DiriveModeEL ? "FLAG_Brake" : "FLAG_Complete";
+    message_status.append(value);
+
+    message_status.append("<br><b>AZ: Отправл. команды:</b> " + QString::number(static_cast<double>(cmd_ans_status->CountCmdSendDrAZ)) + " ");
+    message_status.append("<b>Ошиб.nответы:</b> " + QString::number(static_cast<double>(cmd_ans_status->CountErrorAnsDrAZ)) + " ");
+    message_status.append("<b>Пропущ. ответы:</b> " + QString::number(static_cast<double>(cmd_ans_status->CountMissedAnsDrAZ)));
+
+    message_status.append("<br><b>EL: Отправл. команды:</b> " + QString::number(static_cast<double>(cmd_ans_status->CountCmdSendDrEL)) + " ");
+    message_status.append("<b>Ошиб. ответы:</b> " + QString::number(static_cast<double>(cmd_ans_status->CountErrorAnsDrEL)) + " ");
+    message_status.append("<b>Пропущ. ответы:</b> " + QString::number(static_cast<double>(cmd_ans_status->CountMissedAnsDrEL)));
 
     ui->textEdit_3->setText(message_status);
 }

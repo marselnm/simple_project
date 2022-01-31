@@ -17,7 +17,7 @@
 #define CMD_READ_STATUS 0x34//Прочитать статус
 #define CMD_CHANGE_NETPARAMS 0x05//Изменить настройки подключения
 #define CMD_CHECK_LINK 0x01//Проверка связи (пинг)
-#define CMD_GET_DEVICE_INFO 0x06//Проверка связи (пинг)
+#define CMD_GET_DEVICE_INFO 0x06//
 #define CMD_GET_MAC_ADDRESS 0x02//Получить MAC-адрес устройства
 #define CMD_GET_NETPARAMS 0x04//Получить настройки сети
 #define CMD_ANS_STATUS 0x8A//Идентификатор ответа на команду CMD_READ_STATUS
