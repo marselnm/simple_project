@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     CountAns = 0;
     Connect = 0;//соединение не было установлено
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:red;}");
-    ui->lineEdit->setText("127.0.0.1");//ip-по умолчанию
+    ui->lineEdit->setText("172.16.2.49");//ip-по умолчанию
     ui->lineEdit_2->setText("10000");//порт согласно универсальному протоколу
 
     HostAP.setAddress(ui->lineEdit->text());
@@ -570,7 +570,10 @@ void MainWindow::on_pushButton_check_link_clicked()
     cmd_simple_t cmd_simple;
     cmd_simple.Lenght = sizeof (cmd_simple_t);
     cmd_simple.Message_ID = CMD_CHECK_LINK;
-    opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_simple), cmd_simple.Lenght, HostAP, PortAP);
+
+    int temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_simple), cmd_simple.Lenght, HostAP, PortAP);
+
+
     PutCmdOnForm(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
     IncCountCMD();
 }
