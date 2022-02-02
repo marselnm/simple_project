@@ -319,6 +319,9 @@ void MainWindow::ShowCmdAnsStatus(cmd_ans_status_t *cmd_ans_status)
     message_status.append("<b>Ошиб. ответы:</b> " + QString::number(static_cast<double>(cmd_ans_status->CountErrorAnsDrEL)) + " ");
     message_status.append("<b>Пропущ. ответы:</b> " + QString::number(static_cast<double>(cmd_ans_status->CountMissedAnsDrEL)));
 
+    message_status.append("<br><b>Крутящий момент AZ:</b> " + QString::number(static_cast<double>(cmd_ans_status->DriveMomAZ)));
+    message_status.append("<br><b>Крутящий момент EL:</b> " + QString::number(static_cast<double>(cmd_ans_status->DriveMomEL)));
+
     ui->textEdit_3->setText(message_status);
 }
 

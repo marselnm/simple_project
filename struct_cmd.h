@@ -165,6 +165,7 @@ typedef struct  __attribute__((packed)) cmd_ans_status
     uint8_t SignalAZ;
     float ErrorAZ;
     float SpeedAZ;
+    float DriveMomAZ;
     uint8_t DiriveModeAZ;
     uint8_t CountCmdSendDrAZ;
     uint8_t CountErrorAnsDrAZ;
@@ -180,6 +181,7 @@ typedef struct  __attribute__((packed)) cmd_ans_status
     uint8_t SignalEL;
     float ErrorEL;
     float SpeedEL;
+    float DriveMomEL;
     uint8_t DiriveModeEL;
     uint8_t CountCmdSendDrEL;
     uint8_t CountErrorAnsDrEL;
@@ -195,6 +197,7 @@ typedef struct  __attribute__((packed)) cmd_ans_status
     uint8_t SignalPOL;
     float ErrorPOL;
     float SpeedPOL;
+    float DriveMomPOL;
     uint8_t DiriveModePOL;
     uint8_t CountCmdSendDrPOL;
     uint8_t CountErrorAnsDrPOL;
