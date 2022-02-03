@@ -12,7 +12,7 @@
 #define CMD_MOVE_PARK_POSITION 0x45//Перейти в парковочное положение
 #define CMD_ADJUST_PARK_POSITION 0x46//Настроить парковочное положение
 #define CMD_SET_RELAY_STATE 0x47//Переключение реле
-#define CMD_TEST_SEVO_CONNECTION 0x48//Запуск тестов
+#define CMD_TEST_SERVO_CONNECTION 0x48//Запуск тестов
 #define CMD_SET_SERVO_WORK_MODE 0x49//Настроить режим работы привода
 #define CMD_READ_STATUS 0x34//Прочитать статус
 #define CMD_CHANGE_NETPARAMS 0x05//Изменить настройки подключения
@@ -49,8 +49,8 @@ typedef struct  __attribute__((packed)) cmd_stop_moving
 {
     uint16_t Lenght;
     uint8_t Message_ID;
-    uint8_t Mask;
-} cmd_stop_moving_t;
+    uint8_t Mask;       //1 бит - стоп по AZ, 2 бит - стоп по EL, 3 бит - стоп по POL,
+} cmd_stop_moving_t;    //пример: 0x01 – остановка по азимуту, 0x02 – по углу места, 0x07 – по всем трем
 #pragma pack(pop)
 
 #pragma pack(push, 1)
@@ -93,12 +93,12 @@ typedef struct  __attribute__((packed)) cmd_set_relay_state
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-typedef struct  __attribute__((packed)) cmd_test_sevo_connection
+typedef struct  __attribute__((packed)) cmd_test_servo_connection
 {
     uint16_t Lenght;
     uint8_t Message_ID;
     uint8_t TypeOfTest;
-} cmd_test_sevo_connection_t;
+} cmd_test_servo_connection_t;
 #pragma pack(pop)
 
 #pragma pack(push, 1)
@@ -151,9 +151,6 @@ typedef struct  __attribute__((packed)) cmd_ans_status
     int8_t Temperaure;
     uint8_t StateRelay1;
     uint8_t StateRelay2;
-    uint8_t hour;
-    uint8_t min;
-    uint8_t sec;
     float CurrentAZ;
     float SetAZ;
     float ParkAZ;
@@ -161,7 +158,7 @@ typedef struct  __attribute__((packed)) cmd_ans_status
     uint8_t EndSwitchesAZ;
     uint8_t ConnectAZ;
     int8_t TemperatureAZ;
-    uint8_t ErrosCodeAZ;
+    uint16_t ErrosCodeAZ;
     uint8_t SignalAZ;
     float ErrorAZ;
     float SpeedAZ;
@@ -177,7 +174,7 @@ typedef struct  __attribute__((packed)) cmd_ans_status
     uint8_t EndSwitchesEL;
     uint8_t ConnectEL;
     int8_t TemperatureEL;
-    uint8_t ErrosCodeEL;
+    uint16_t ErrosCodeEL;
     uint8_t SignalEL;
     float ErrorEL;
     float SpeedEL;
@@ -193,7 +190,7 @@ typedef struct  __attribute__((packed)) cmd_ans_status
     uint8_t EndSwitchesPOL;
     uint8_t ConnectPOL;
     int8_t TemperaturePOL;
-    uint8_t ErrosCodePOL;
+    uint16_t ErrosCodePOL;
     uint8_t SignalPOL;
     float ErrorPOL;
     float SpeedPOL;
