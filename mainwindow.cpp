@@ -7,15 +7,16 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    SettingsWrapper settings("settings.ini", this);
-    settings.load();
+    //SettingsWrapper settings("settings.ini", this);
+    //settings.load();
 
     CountCMD = 0;
     CountAns = 0;
     Connect = 0;//соединение не было установлено
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:red;}");
 
-    ui->lineEdit->setText("172.16.2.49");//ip-по умолчанию
+    ui->lineEdit->setText("127.0.0.1");//ip-по умолчанию
+    //ui->lineEdit->setText("172.16.2.49");//ip-по умолчанию
     ui->lineEdit_2->setText("10000");//порт согласно универсальному протоколу
 
     HostAP.setAddress(ui->lineEdit->text());
@@ -83,10 +84,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    SettingsWrapper settings("settings.ini", this);
-    settings.save(); // сохраняем значения QSpinBox и QLineEdit
+    //SettingsWrapper settings("settings.ini", this);
+    //settings.save(); // сохраняем значения QSpinBox и QLineEdit
     timeupdate->stop();
-    delete timeupdate;
     delete ui;
 }
 
