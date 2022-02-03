@@ -15,8 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
     Connect = 0;//соединение не было установлено
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:red;}");
 
-    //ui->lineEdit->setText("127.0.0.1");//ip-по умолчанию
-    ui->lineEdit->setText("172.16.2.49");//ip-по умолчанию
+    ui->lineEdit->setText("127.0.0.1");//ip-по умолчанию
+    //ui->lineEdit->setText("172.16.2.49");//ip-по умолчанию
     ui->lineEdit_2->setText("10000");//порт согласно универсальному протоколу
 
     //HostAP.setAddress(ui->lineEdit->text());
@@ -310,12 +310,36 @@ void MainWindow::ShowCmdAnsStatus(cmd_ans_status_t *cmd_ans_status)
     message_status.append("<br><b>Допустимая ошибка EL:</b> " + QString::number(static_cast<double>(cmd_ans_status->ErrorEL)));
 
     message_status.append("<br><b>Режим двигателя AZ:</b> ");
-    value = cmd_ans_status->DiriveModeAZ ? "FLAG_Brake" : "FLAG_Complete";
-    message_status.append(value);
+
+    int FLAG_CompleteAZ = (cmd_ans_status->DiriveModeAZ >> 0) & 0x01;
+    if(FLAG_CompleteAZ){
+        message_status.append("FLAG_Complete: Вкл. ");
+    }else {
+        message_status.append("FLAG_Complete: Выкл. ");
+    }
+
+    int FLAG_BrakeAZ = (cmd_ans_status->DiriveModeAZ >> 1) & 0x01;
+    if(FLAG_BrakeAZ){
+        message_status.append("FLAG_Brake: Вкл.");
+    }else {
+        message_status.append("FLAG_Brake: Выкл.");
+    }
 
     message_status.append("<br><b>Режим двигателя EL:</b> ");
-    value = cmd_ans_status->DiriveModeEL ? "FLAG_Brake" : "FLAG_Complete";
-    message_status.append(value);
+
+    int FLAG_CompleteEL = (cmd_ans_status->DiriveModeEL >> 0) & 0x01;
+    if(FLAG_CompleteEL){
+        message_status.append("FLAG_Complete: Вкл. ");
+    }else {
+        message_status.append("FLAG_Complete: Выкл. ");
+    }
+
+    int FLAG_BrakeEL = (cmd_ans_status->DiriveModeEL >> 1) & 0x01;
+    if(FLAG_BrakeEL){
+        message_status.append("FLAG_Brake: Вкл.");
+    }else {
+        message_status.append("FLAG_Brake: Выкл.");
+    }
 
     message_status.append("<br><b>AZ: Отправл. команды:</b> " + QString::number(static_cast<double>(cmd_ans_status->CountCmdSendDrAZ)) + " ");
     message_status.append("<b>Ошиб.nответы:</b> " + QString::number(static_cast<double>(cmd_ans_status->CountErrorAnsDrAZ)) + " ");
