@@ -15,7 +15,14 @@ MainWindow::MainWindow(QWidget *parent) :
     Connect = 0;//соединение не было установлено
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:red;}");
 
+    ui->lineEdit->setText("172.16.2.49");//ip-по умолчанию
+    ui->lineEdit_2->setText("10000");//порт согласно универсальному протоколу
+
+    HostAP.setAddress(ui->lineEdit->text());
+    PortAP = static_cast<quint16>(ui->lineEdit_2->text().toInt());
+
     opu_socket = new QUdpSocket();
+    opu_socket->bind(HostAP, 9999);
     connect(opu_socket, &QUdpSocket::readyRead, this, &MainWindow::receive_message_from_opu);
 
     //заполнение QComboBox для коррекции положения
@@ -744,8 +751,6 @@ void MainWindow::on_pushButton_connect_clicked()
 {
     HostAP.setAddress(ui->lineEdit->text());
     PortAP = static_cast<quint16>(ui->lineEdit_2->text().toInt());
-
-    opu_socket->bind(HostAP, 9999);
 
     Connect = 1;
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:green;}");
