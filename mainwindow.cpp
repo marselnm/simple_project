@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:red;}");
 
     opu_socket = new QUdpSocket();
+    connect(opu_socket, &QUdpSocket::readyRead, this, &MainWindow::receive_message_from_opu);
 
     //заполнение QComboBox для коррекции положения
     ui->comboBox_cor_pos->addItem("AZ");
@@ -745,7 +746,6 @@ void MainWindow::on_pushButton_connect_clicked()
     PortAP = static_cast<quint16>(ui->lineEdit_2->text().toInt());
 
     opu_socket->bind(HostAP, 9999);
-    connect(opu_socket, &QUdpSocket::readyRead, this, &MainWindow::receive_message_from_opu);
 
     Connect = 1;
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:green;}");
