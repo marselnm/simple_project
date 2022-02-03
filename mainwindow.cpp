@@ -7,17 +7,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //SettingsWrapper settings("settings.ini", this);
-    //settings.load();
-
     CountCMD = 0;
     CountAns = 0;
     Connect = 0;//соединение не было установлено
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:red;}");
 
-    ui->lineEdit->setText("127.0.0.1");//ip-по умолчанию
+    //ui->lineEdit->setText("127.0.0.1");//ip-по умолчанию
     //ui->lineEdit->setText("172.16.2.49");//ip-по умолчанию
-    ui->lineEdit_2->setText("10000");//порт согласно универсальному протоколу
+    //ui->lineEdit_2->setText("10000");//порт согласно универсальному протоколу
 
     //HostAP.setAddress(ui->lineEdit->text());
     //PortAP = static_cast<quint16>(ui->lineEdit_2->text().toInt());
@@ -78,12 +75,18 @@ MainWindow::MainWindow(QWidget *parent) :
     timeupdate = new QTimer();
     timeupdate->setInterval(1000);
     connect(timeupdate, &QTimer::timeout, this, &MainWindow::SendCmdReadStatusAuto);
+
+    SettingsWrapper settings("settings.ini", this);
+    settings.load();
+
+    ui->checkBox_6->setCheckState(Qt::Unchecked);
+    ui->checkBox_6->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
 {
-    //SettingsWrapper settings("settings.ini", this);
-    //settings.save(); // сохраняем значения QSpinBox и QLineEdit
+    SettingsWrapper settings("settings.ini", this);
+    settings.save(); // сохраняем значения QSpinBox и QLineEdit
     timeupdate->stop();
     delete ui;
 }
@@ -776,10 +779,14 @@ void MainWindow::on_pushButton_connect_clicked()
     HostAP.setAddress(ui->lineEdit->text());
     PortAP = static_cast<quint16>(ui->lineEdit_2->text().toInt());
 
+    opu_socket->disconnect();
+    opu_socket->abort();
+
     opu_socket->bind(HostAP, 9999);
     connect(opu_socket, &QUdpSocket::readyRead, this, &MainWindow::receive_message_from_opu);
 
     Connect = 1;
+    ui->checkBox_6->setEnabled(true);
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:green;}");
 }
 
@@ -827,7 +834,7 @@ void MainWindow::on_pushButton_clean_edit_clicked()
 
 void MainWindow::on_checkBox_6_stateChanged(int arg1)
 {
-    if(arg1 == 2)
+    if(arg1 == 2 && Connect == 1)
     {
         timeupdate->start();
     }else
