@@ -6,20 +6,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    SettingsWrapper settings("settings.ini", this);
+    settings.load();
+
     CountCMD = 0;
     CountAns = 0;
     Connect = 0;//соединение не было установлено
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:red;}");
-    //ui->lineEdit->setText("127.0.0.1");//ip-по умолчанию
-    ui->lineEdit->setText("172.16.2.49");//ip-по умолчанию
-    ui->lineEdit_2->setText("10000");//порт согласно универсальному протоколу
-
-    HostAP.setAddress(ui->lineEdit->text());
-    PortAP = static_cast<quint16>(ui->lineEdit_2->text().toInt());
 
     opu_socket = new QUdpSocket();
-    opu_socket->bind(HostAP, 9999);
-    connect(opu_socket, &QUdpSocket::readyRead, this, &MainWindow::receive_message_from_opu);
 
     //заполнение QComboBox для коррекции положения
     ui->comboBox_cor_pos->addItem("AZ");
@@ -79,6 +75,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    SettingsWrapper settings("settings.ini", this);
+    settings.save(); // сохраняем значения QSpinBox и QLineEdit
     delete ui;
 }
 
@@ -746,6 +744,9 @@ void MainWindow::on_pushButton_connect_clicked()
     HostAP.setAddress(ui->lineEdit->text());
     PortAP = static_cast<quint16>(ui->lineEdit_2->text().toInt());
 
+    opu_socket->bind(HostAP, 9999);
+    connect(opu_socket, &QUdpSocket::readyRead, this, &MainWindow::receive_message_from_opu);
+
     Connect = 1;
     ui->pushButton_connect->setStyleSheet("QPushButton{background-color:green;}");
 }
@@ -811,8 +812,14 @@ void MainWindow::SendCmdReadStatusAuto()
 
     if(1)//если связь была установлена
     {
-        opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_read_status), cmd_read_status.Lenght, HostAP, PortAP);
-        PutCmdOnForm(reinterpret_cast<char*>(&cmd_read_status),  cmd_read_status.Lenght);
-        IncCountCMD();
+        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_read_status), cmd_read_status.Lenght, HostAP, PortAP);
+
+        if(temp == cmd_read_status.Lenght)
+        {
+            PutCmdOnForm(reinterpret_cast<char*>(&cmd_read_status),  cmd_read_status.Lenght);
+            IncCountCMD();
+        }else {
+            qDebug() << "Не удалось отправить";
+        }
     }
 }

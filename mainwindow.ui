@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -130,7 +130,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget1">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -232,7 +232,7 @@
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout">
+              <layout class="QHBoxLayout" name="horizontalLayout_m1">
                <item>
                 <widget class="QPushButton" name="pushButton_ret_az_el">
                  <property name="sizePolicy">
@@ -261,7 +261,7 @@
                 </layout>
                </item>
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout">
+                <layout class="QVBoxLayout" name="verticalLayout_m2">
                  <item>
                   <widget class="QLabel" name="label_4">
                    <property name="text">

@@ -7,6 +7,7 @@
 #include <QTimer>
 
 #include "struct_cmd.h"
+#include "settingswrapper.h"
 
 namespace Ui {
 class MainWindow;
@@ -80,6 +81,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    SettingsWrapper* settings_;
     QUdpSocket *opu_socket;
     QHostAddress HostAP;
     quint16 PortAP;
