@@ -85,6 +85,8 @@ MainWindow::~MainWindow()
 {
     SettingsWrapper settings("settings.ini", this);
     settings.save(); // сохраняем значения QSpinBox и QLineEdit
+    timeupdate->stop();
+    delete timeupdate;
     delete ui;
 }
 
