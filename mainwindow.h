@@ -8,6 +8,7 @@
 
 #include "struct_cmd.h"
 #include "settingswrapper.h"
+#include "file_test.h"
 
 namespace Ui {
 class MainWindow;
@@ -79,6 +80,8 @@ private slots:
 
     void SendCmdReadStatusAuto();
 
+    void on_test_from_file_triggered();
+
 private:
     Ui::MainWindow *ui;
     SettingsWrapper* settings_;
@@ -91,6 +94,7 @@ private:
     cmd_ans_status_t cmd_ans_status;
     QTimer *timeupdate;
     cmd_ans_netparams_t cmd_ans_netparams;
+    FileTest *test_from_file;
 };
 
 #endif // MAINWINDOW_H

@@ -862,3 +862,18 @@ void MainWindow::SendCmdReadStatusAuto()
         }
     }
 }
+
+void MainWindow::on_test_from_file_triggered()
+{
+    test_from_file = new FileTest();
+    test_from_file->show();
+
+}
+
+
+
+
+
+
+
+

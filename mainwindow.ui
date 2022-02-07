@@ -1179,6 +1179,16 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
+   </property>
+   <widget class="QMenu" name="menu_test">
+    <property name="title">
+     <string>Тестирование</string>
+    </property>
+    <addaction name="test_from_file"/>
+   </widget>
+   <addaction name="menu_test"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -1189,6 +1199,11 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="test_from_file">
+   <property name="text">
+    <string>Тестирование ОПУ из файла</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
