@@ -81,6 +81,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->checkBox_6->setCheckState(Qt::Unchecked);
     ui->checkBox_6->setEnabled(false);
+
+    test_from_file = new FileTest();
+    connect(test_from_file, &FileTest::GetStatus, this, &MainWindow::GetNewStatus);
+    connect(this, SIGNAL(SendStatusFotTesting(QByteArray*)), test_from_file, SLOT(GetStatusFotTesting(QByteArray*)));
 }
 
 MainWindow::~MainWindow()
@@ -812,6 +816,7 @@ void MainWindow::receive_message_from_opu()
             {
                 memcpy(reinterpret_cast<char*>(&cmd_ans_status), Buffer.data(), sizeof(cmd_ans_status_t));
                 ShowCmdAnsStatus(&cmd_ans_status);
+                emit SendStatusFotTesting(&Buffer);
             }
             break;
         }
@@ -865,9 +870,27 @@ void MainWindow::SendCmdReadStatusAuto()
 
 void MainWindow::on_test_from_file_triggered()
 {
-    test_from_file = new FileTest();
     test_from_file->show();
+}
 
+void MainWindow::GetNewStatus()
+{
+    cmd_read_status_t cmd_read_status;
+    cmd_read_status.Lenght = sizeof (cmd_read_status_t);
+    cmd_read_status.Message_ID = CMD_READ_STATUS;
+
+    if(1)//если связь была установлена
+    {
+        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_read_status), cmd_read_status.Lenght, HostAP, PortAP);
+
+        if(temp == cmd_read_status.Lenght)
+        {
+            PutCmdOnForm(reinterpret_cast<char*>(&cmd_read_status),  cmd_read_status.Lenght);
+            IncCountCMD();
+        }else {
+            qDebug() << "Не удалось отправить";
+        }
+    }
 }
 
 

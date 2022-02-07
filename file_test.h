@@ -3,7 +3,8 @@
 
 #include <QDialog>
 #include <QTimer>
-//#include "ca_antennamessage.h"
+
+#include "struct_cmd.h"
 
 namespace file_test {
 enum class TestOpuState {
@@ -34,8 +35,11 @@ class FileTest : public QDialog
 public:
     explicit FileTest(QWidget *parent = nullptr);
     ~FileTest();
+    void closeEvent(QCloseEvent *event);
+
 
 public slots:
+    void GetStatusFotTesting(QByteArray *AnsData);
     //void newStatus(const ca_messages::out::Status& status);
     //void newOk(const ca_messages::out::Ok &ok);
     //void newError(const ca_messages::out::Error &error);
@@ -45,17 +49,19 @@ private slots:
     //void on_bStart_clicked();
     //void on_bStop_clicked();
 
+    void on_bStart_clicked();
+    void read_status();
+
 signals:
-    /*!
-     * \brief Сигнал "Сообщение подготовлено"
-     */
-    //void messageReady(const ca_messages::Message&);
+    void GetStatus();
 
 private:
     Ui::FileTest *ui;
     QVector<file_test::TestOpu> tests;
     QVector<file_test::TestOpu> readFile(QString title);
     bool checkValues(file_test::TestOpu test);
+    cmd_ans_status_t cmd_ans_status_2;
+    QTimer statusTimer;
 
     static constexpr float minAz = -180.;
     static constexpr float maxAz = 180.;
@@ -78,7 +84,7 @@ private:
     bool checkPosition = false;
 
     QTimer waitstartTimer;
-    QTimer statusTimer;
+
     QTimer testTimer;
 
     void errorTest();

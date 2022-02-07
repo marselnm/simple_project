@@ -28,6 +28,8 @@ public:
     void ShowCmdAnsStatus(cmd_ans_status_t *cmd_ans_status);
     void ShowCmdAnsNetparams(cmd_ans_netparams_t *cmd_ans_netparams);
 
+signals:
+    void SendStatusFotTesting(QByteArray *AnsData);
 
 private slots:
     void on_pushButton_ret_az_el_clicked();
@@ -81,6 +83,8 @@ private slots:
     void SendCmdReadStatusAuto();
 
     void on_test_from_file_triggered();
+
+    void GetNewStatus();
 
 private:
     Ui::MainWindow *ui;

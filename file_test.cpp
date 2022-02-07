@@ -13,45 +13,20 @@ FileTest::FileTest(QWidget *parent) :
 {
     ui->setupUi(this);
 
-//    connect(&statusTimer, &QTimer::timeout, [&]{
-//        ca_messages::in::ReadStatus command;
-//        command.deviaceId = ca_messages::DeviceId::ALL_DEVICES;
-//        ca_messages::Message message;
-//        message.append(reinterpret_cast<char*>(&command), ca_messages::sizeOfReadStatus);
-//        emit messageReady(message);
-
-//    });
+    connect(&statusTimer, &QTimer::timeout, this, &FileTest::read_status);
 
 
-//    testTimer.setSingleShot(true);
-//    connect(&testTimer, &QTimer::timeout, [&]{
-//        checkPosition = true;
-//    });
-
-//    connect(this, &QDialog::rejected, [&]{
-//        restart();
-//    });
-
-//    waitstartTimer.setSingleShot(true);
-//    connect(&waitstartTimer, &QTimer::timeout, [&]{
-
-//        updateResult(currentTest, false);
-//        ui->tbInfo->append("timeout");
-
-//        ca_messages::in::StopMove command;
-//        ca_messages::Message message;
-//        message.append(reinterpret_cast<char*>(&command), ca_messages::sizeOfStopMove);
-//        emit messageReady(message);
-//        state = file_test::TestOpuState::WAIT_STOP_MOVE;
-//        currentTest++;
-
-
-//    });
 }
 
 FileTest::~FileTest()
 {
     delete ui;
+}
+
+void FileTest::closeEvent(QCloseEvent *event)
+{
+    Q_UNUSED(event);
+    statusTimer.stop();
 }
 
 void FileTest::on_bOpenFile_clicked()
@@ -74,6 +49,16 @@ void FileTest::on_bOpenFile_clicked()
 
     if(tests.size() > 0)
         ui->bStart->setEnabled(true);
+}
+
+void FileTest::read_status()
+{
+    emit GetStatus();
+}
+
+void FileTest::GetStatusFotTesting(QByteArray *AnsData)
+{
+    memcpy(reinterpret_cast<char*>(&cmd_ans_status_2), AnsData->data(), sizeof(cmd_ans_status_t));
 }
 
 QVector<file_test::TestOpu> FileTest::readFile(QString title){
@@ -366,14 +351,13 @@ bool FileTest::checkValues(file_test::TestOpu test)
 
 
 
-//void FileTest::on_bStart_clicked()
-//{
-//    ui->bStop->setEnabled(true);
-//    ui->bStart->setEnabled(false);
-//    ui->bOpenFile->setEnabled(false);
-
-//    startTest();
-//}
+void FileTest::on_bStart_clicked()
+{
+    ui->bStop->setEnabled(true);
+    ui->bStart->setEnabled(false);
+    ui->bOpenFile->setEnabled(false);
+    statusTimer.start(500);
+}
 
 //void FileTest::on_bStop_clicked()
 //{
@@ -396,3 +380,5 @@ bool FileTest::checkValues(file_test::TestOpu test)
 //    ui->tbInfo->clear();
 //    ui->lSuccess->setText("");
 //}
+
+
