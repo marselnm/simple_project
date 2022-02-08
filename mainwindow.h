@@ -86,6 +86,8 @@ private slots:
 
     void GetNewStatus();
 
+    void SetPosition(QByteArray *position);
+
 private:
     Ui::MainWindow *ui;
     SettingsWrapper* settings_;

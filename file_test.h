@@ -6,13 +6,23 @@
 
 #include "struct_cmd.h"
 
+#define AZ_SPEED 5
+#define EL_SPEED 5
+
 namespace file_test {
-enum class TestOpuState {
+enum class TestOpuState
+{
+    GET_STATUS,//запросить статус антенны
+
+
+
     WAIT_STOP_MOVE,
     WAIT_STOP_STATUS,
     WAIT_START_TEST,
     RUN_TEST,
-    FINISH_TEST
+    FINISH_TEST,
+    STOP_TEST,
+    NOP//ничего не делать
 };
 
 struct TestOpu
@@ -36,6 +46,8 @@ public:
     explicit FileTest(QWidget *parent = nullptr);
     ~FileTest();
     void closeEvent(QCloseEvent *event);
+    void SendPosition(float AZ, float EL);
+
 
 
 public slots:
@@ -46,6 +58,7 @@ public slots:
 
 private slots:
     void on_bOpenFile_clicked();
+    void MainTest();
     //void on_bStart_clicked();
     //void on_bStop_clicked();
 
@@ -54,6 +67,7 @@ private slots:
 
 signals:
     void GetStatus();
+    void sigSetPosition(QByteArray *position);
 
 private:
     Ui::FileTest *ui;
@@ -62,6 +76,9 @@ private:
     bool checkValues(file_test::TestOpu test);
     cmd_ans_status_t cmd_ans_status_2;
     QTimer statusTimer;
+    file_test::TestOpuState state;
+    int currentTest = 0;
+    QTimer startTest;
 
     static constexpr float minAz = -180.;
     static constexpr float maxAz = 180.;
@@ -75,7 +92,7 @@ private:
     bool startFlag = false;
     //ca_messages::out::Position position;
     //file_test::TestOpuState state;
-    uint currentTest = 0;
+
 
     constexpr static float errorAngle = 0.3;
     constexpr static uint waittime = 500;
@@ -91,7 +108,7 @@ private:
     void restart();
     void updateResult(uint test, bool result);
     void runTest(uint test);
-    void startTest();
+
 
     uint successTest = 0;
 };

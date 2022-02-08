@@ -13,9 +13,7 @@ FileTest::FileTest(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(&statusTimer, &QTimer::timeout, this, &FileTest::read_status);
-
-
+    connect(&startTest, &QTimer::timeout, this, &FileTest::MainTest);
 }
 
 FileTest::~FileTest()
@@ -26,7 +24,54 @@ FileTest::~FileTest()
 void FileTest::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event);
-    statusTimer.stop();
+    startTest.stop();
+}
+
+void FileTest::SendPosition(float AZ, float EL)
+{
+    QByteArray Buffer;
+
+    cmd_set_position_t cmd_set_position;
+    cmd_set_position.Lenght = sizeof (cmd_set_position_t);
+    cmd_set_position.Message_ID = CMD_SET_POSITION;
+    cmd_set_position.AZ_Speed = AZ_SPEED;
+    cmd_set_position.AZ_Position = AZ;
+    cmd_set_position.EL_Speed = EL_SPEED;
+    cmd_set_position.EL_Position = EL;
+
+    Buffer.append(reinterpret_cast<const char*>(&cmd_set_position), sizeof(cmd_set_position_t));
+
+    emit sigSetPosition(&Buffer);
+}
+
+void FileTest::MainTest()
+{
+
+    switch (state)
+    {
+        case file_test::TestOpuState::GET_STATUS:
+        {
+            emit GetStatus();
+            state = file_test::TestOpuState::NOP;
+            break;
+        }
+
+        case file_test::TestOpuState::RUN_TEST:
+        {
+            float newAZ = tests.at(currentTest).az;
+            float newEL = tests.at(currentTest).el;
+
+            int ErrorAZ = static_cast<int>(abs(cmd_ans_status_2.CurrentAZ - tests.at(currentTest).az));
+            int ErrorEL = static_cast<int>(abs(cmd_ans_status_2.CurrentEL - tests.at(currentTest).el));
+
+            break;
+        }
+
+        case file_test::TestOpuState::NOP:
+        {
+            break;
+        }
+    }
 }
 
 void FileTest::on_bOpenFile_clicked()
@@ -59,6 +104,13 @@ void FileTest::read_status()
 void FileTest::GetStatusFotTesting(QByteArray *AnsData)
 {
     memcpy(reinterpret_cast<char*>(&cmd_ans_status_2), AnsData->data(), sizeof(cmd_ans_status_t));
+
+    if(cmd_ans_status_2.StateDriveAZ == 0 && cmd_ans_status_2.StateDriveEL == 0)//если привода остановлены
+    {
+        state = file_test::TestOpuState::RUN_TEST;
+    }else {
+        state = file_test::TestOpuState::NOP;
+    }
 }
 
 QVector<file_test::TestOpu> FileTest::readFile(QString title){
@@ -356,7 +408,9 @@ void FileTest::on_bStart_clicked()
     ui->bStop->setEnabled(true);
     ui->bStart->setEnabled(false);
     ui->bOpenFile->setEnabled(false);
-    statusTimer.start(500);
+
+    state = file_test::TestOpuState::GET_STATUS;
+    startTest.start(1000);
 }
 
 //void FileTest::on_bStop_clicked()

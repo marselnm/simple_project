@@ -85,6 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
     test_from_file = new FileTest();
     connect(test_from_file, &FileTest::GetStatus, this, &MainWindow::GetNewStatus);
     connect(this, SIGNAL(SendStatusFotTesting(QByteArray*)), test_from_file, SLOT(GetStatusFotTesting(QByteArray*)));
+    connect(test_from_file, SIGNAL(sigSetPosition(QByteArray*)), this, SLOT(SetPosition(QByteArray*)));
 }
 
 MainWindow::~MainWindow()
@@ -886,6 +887,25 @@ void MainWindow::GetNewStatus()
         if(temp == cmd_read_status.Lenght)
         {
             PutCmdOnForm(reinterpret_cast<char*>(&cmd_read_status),  cmd_read_status.Lenght);
+            IncCountCMD();
+        }else {
+            qDebug() << "Не удалось отправить";
+        }
+    }
+}
+
+void MainWindow::SetPosition(QByteArray *position)
+{
+    cmd_set_position_t cmd_set_position;
+    memcpy(reinterpret_cast<char*>(&cmd_set_position), position->data(), sizeof(cmd_set_position_t));
+
+    if(1)//если связь была установлена
+    {
+        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_position), cmd_set_position.Lenght, HostAP, PortAP);
+
+        if(temp == cmd_set_position.Lenght)
+        {
+            PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_position),  cmd_set_position.Lenght);
             IncCountCMD();
         }else {
             qDebug() << "Не удалось отправить";
