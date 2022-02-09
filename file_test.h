@@ -12,15 +12,10 @@
 namespace file_test {
 enum class TestOpuState
 {
-    GET_STATUS,//запросить статус антенны
-
-
-
-    WAIT_STOP_MOVE,
-    WAIT_STOP_STATUS,
-    WAIT_START_TEST,
+    BEGIN,
     RUN_TEST,
-    FINISH_TEST,
+    TEST_OK,
+    TEST_FALSE,
     STOP_TEST,
     NOP//ничего не делать
 };
@@ -47,8 +42,7 @@ public:
     ~FileTest();
     void closeEvent(QCloseEvent *event);
     void SendPosition(float AZ, float EL);
-
-
+    void StopTests();
 
 public slots:
     void GetStatusFotTesting(QByteArray *AnsData);
@@ -59,6 +53,7 @@ public slots:
 private slots:
     void on_bOpenFile_clicked();
     void MainTest();
+    void OneTest();
     //void on_bStart_clicked();
     //void on_bStop_clicked();
 
@@ -79,6 +74,7 @@ private:
     file_test::TestOpuState state;
     int currentTest = 0;
     QTimer startTest;
+    QTimer oneTest;
 
     static constexpr float minAz = -180.;
     static constexpr float maxAz = 180.;
@@ -110,7 +106,8 @@ private:
     void runTest(uint test);
 
 
-    uint successTest = 0;
+    int successTest = 0;
+    int falseTest = 0;
 };
 
 #endif // CA_FILETESTOPUDIALOG_H

@@ -14,6 +14,7 @@ FileTest::FileTest(QWidget *parent) :
     ui->setupUi(this);
 
     connect(&startTest, &QTimer::timeout, this, &FileTest::MainTest);
+    connect(&oneTest, &QTimer::timeout, this, &FileTest::OneTest);
 }
 
 FileTest::~FileTest()
@@ -44,15 +45,21 @@ void FileTest::SendPosition(float AZ, float EL)
     emit sigSetPosition(&Buffer);
 }
 
+void FileTest::StopTests()
+{
+    ui->lSuccess->setText(QString::number(successTest));
+    ui->bStop->setEnabled(false);
+    ui->bStart->setEnabled(true);
+    ui->bOpenFile->setEnabled(true);
+}
+
 void FileTest::MainTest()
 {
-
     switch (state)
     {
-        case file_test::TestOpuState::GET_STATUS:
+        case file_test::TestOpuState::BEGIN:
         {
             emit GetStatus();
-            state = file_test::TestOpuState::NOP;
             break;
         }
 
@@ -64,13 +71,75 @@ void FileTest::MainTest()
             int ErrorAZ = static_cast<int>(abs(cmd_ans_status_2.CurrentAZ - tests.at(currentTest).az));
             int ErrorEL = static_cast<int>(abs(cmd_ans_status_2.CurrentEL - tests.at(currentTest).el));
 
+            int time = 0;
+
+            if(ErrorAZ >= ErrorEL)
+            {
+                time = ErrorAZ + 5;
+            }else {
+                time = ErrorEL + 5;
+            }
+
+
+            SendPosition(newAZ, newEL);
+            state = file_test::TestOpuState::NOP;
+            oneTest.start(time*1000);
+
+            break;
+        }
+
+        case file_test::TestOpuState::TEST_OK:
+        {
+            currentTest++;
+            successTest++;
+
+            if(currentTest == tests.size())
+            {
+                state = file_test::TestOpuState::STOP_TEST;
+                startTest.stop();
+                StopTests();
+            }else {
+                state = file_test::TestOpuState::RUN_TEST;
+            }
+            break;
+        }
+
+        case file_test::TestOpuState::TEST_FALSE:
+        {
+            currentTest++;
+            falseTest++;
+
+            if(currentTest == tests.size())
+            {
+                state = file_test::TestOpuState::STOP_TEST;
+                startTest.stop();
+                StopTests();
+            }else {
+                state = file_test::TestOpuState::RUN_TEST;
+            }
             break;
         }
 
         case file_test::TestOpuState::NOP:
         {
+            emit GetStatus();
             break;
         }
+    }
+}
+
+void FileTest::OneTest()
+{
+    oneTest.stop();
+
+    int ErrorAZ = static_cast<int>(abs(cmd_ans_status_2.CurrentAZ - tests.at(currentTest).az));
+    int ErrorEL = static_cast<int>(abs(cmd_ans_status_2.CurrentEL - tests.at(currentTest).el));
+
+    if(ErrorAZ <= 0.3 && ErrorEL <= 0.3)
+    {
+        state = file_test::TestOpuState::TEST_OK;
+    }else {
+        state = file_test::TestOpuState::TEST_FALSE;
     }
 }
 
@@ -105,11 +174,9 @@ void FileTest::GetStatusFotTesting(QByteArray *AnsData)
 {
     memcpy(reinterpret_cast<char*>(&cmd_ans_status_2), AnsData->data(), sizeof(cmd_ans_status_t));
 
-    if(cmd_ans_status_2.StateDriveAZ == 0 && cmd_ans_status_2.StateDriveEL == 0)//если привода остановлены
+    if(cmd_ans_status_2.StateDriveAZ == 0 && cmd_ans_status_2.StateDriveEL == 0 && state == file_test::TestOpuState::BEGIN)//если привода остановлены
     {
         state = file_test::TestOpuState::RUN_TEST;
-    }else {
-        state = file_test::TestOpuState::NOP;
     }
 }
 
@@ -409,7 +476,7 @@ void FileTest::on_bStart_clicked()
     ui->bStart->setEnabled(false);
     ui->bOpenFile->setEnabled(false);
 
-    state = file_test::TestOpuState::GET_STATUS;
+    state = file_test::TestOpuState::BEGIN;
     startTest.start(1000);
 }
 
