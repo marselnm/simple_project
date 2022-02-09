@@ -72,9 +72,11 @@ private:
     cmd_ans_status_t cmd_ans_status_2;
     QTimer statusTimer;
     file_test::TestOpuState state;
-    int currentTest = 0;
+    int currentTest;
     QTimer startTest;
     QTimer oneTest;
+    int successTest;
+    int falseTest;
 
     static constexpr float minAz = -180.;
     static constexpr float maxAz = 180.;
@@ -106,8 +108,7 @@ private:
     void runTest(uint test);
 
 
-    int successTest = 0;
-    int falseTest = 0;
+
 };
 
 #endif // CA_FILETESTOPUDIALOG_H

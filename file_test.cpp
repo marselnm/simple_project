@@ -96,8 +96,6 @@ void FileTest::MainTest()
             if(currentTest == tests.size())
             {
                 state = file_test::TestOpuState::STOP_TEST;
-                startTest.stop();
-                StopTests();
             }else {
                 state = file_test::TestOpuState::RUN_TEST;
             }
@@ -112,11 +110,16 @@ void FileTest::MainTest()
             if(currentTest == tests.size())
             {
                 state = file_test::TestOpuState::STOP_TEST;
-                startTest.stop();
-                StopTests();
             }else {
                 state = file_test::TestOpuState::RUN_TEST;
             }
+            break;
+        }
+
+        case file_test::TestOpuState::STOP_TEST:
+        {
+            startTest.stop();
+            StopTests();
             break;
         }
 
@@ -475,6 +478,9 @@ void FileTest::on_bStart_clicked()
     ui->bStop->setEnabled(true);
     ui->bStart->setEnabled(false);
     ui->bOpenFile->setEnabled(false);
+    successTest = 0;
+    falseTest = 0;
+    currentTest = 0;
 
     state = file_test::TestOpuState::BEGIN;
     startTest.start(1000);
