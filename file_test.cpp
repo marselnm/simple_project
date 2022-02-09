@@ -26,6 +26,7 @@ void FileTest::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event);
     startTest.stop();
+    oneTest.stop();
 }
 
 void FileTest::SendPosition(float AZ, float EL)
@@ -47,10 +48,27 @@ void FileTest::SendPosition(float AZ, float EL)
 
 void FileTest::StopTests()
 {
-    ui->lSuccess->setText(QString::number(successTest));
+    ui->tbInfo->append("Тестирование завершено");
     ui->bStop->setEnabled(false);
     ui->bStart->setEnabled(true);
     ui->bOpenFile->setEnabled(true);
+}
+
+void FileTest::PutInfoRUN_TEST(int currentTest)
+{
+    ui->tbInfo->append("Тест " + QString::number(currentTest+1) + " выполняется...");
+    ui->tbInfo->append("Азимут: " + QString::number(static_cast<double>(tests[currentTest].az))
+                       + " Угол места: " + QString::number(static_cast<double>(tests[currentTest].el)));
+}
+
+void FileTest::PutInfoOK_FALSE(int currentTest, int ok_or_false)
+{
+    if(ok_or_false == 1)
+    {
+        ui->tbInfo->append("Тест " + QString::number(currentTest+1) + " выполнен успешно ");
+    }else {
+        ui->tbInfo->append("Тест " + QString::number(currentTest+1) + " не выполнен ");
+    }
 }
 
 void FileTest::MainTest()
@@ -65,6 +83,8 @@ void FileTest::MainTest()
 
         case file_test::TestOpuState::RUN_TEST:
         {
+            PutInfoRUN_TEST(currentTest);
+
             float newAZ = tests.at(currentTest).az;
             float newEL = tests.at(currentTest).el;
 
@@ -80,7 +100,6 @@ void FileTest::MainTest()
                 time = ErrorEL + 5;
             }
 
-
             SendPosition(newAZ, newEL);
             state = file_test::TestOpuState::NOP;
             oneTest.start(time*1000);
@@ -90,8 +109,10 @@ void FileTest::MainTest()
 
         case file_test::TestOpuState::TEST_OK:
         {
+            PutInfoOK_FALSE(currentTest, 1);
             currentTest++;
             successTest++;
+            ui->lSuccess->setText(QString::number(successTest));
 
             if(currentTest == tests.size())
             {
@@ -104,6 +125,7 @@ void FileTest::MainTest()
 
         case file_test::TestOpuState::TEST_FALSE:
         {
+            PutInfoOK_FALSE(currentTest, 1);
             currentTest++;
             falseTest++;
 
@@ -156,6 +178,10 @@ void FileTest::on_bOpenFile_clicked()
 
     tests = readFile(fileName);
     ui->lNumberTest->setText(QString::number(tests.size()));
+
+    ui->lSuccess->setText(QString::number(0));
+
+    ui->tbInfo->clear();
 
 
 //    QVector<file_test::TestOpu>::iterator it = tests.begin(); // создаем итератор и переводим его в начало списка
@@ -479,8 +505,10 @@ void FileTest::on_bStart_clicked()
     ui->bStart->setEnabled(false);
     ui->bOpenFile->setEnabled(false);
     successTest = 0;
+    ui->lSuccess->setText(QString::number(successTest));
     falseTest = 0;
     currentTest = 0;
+    ui->tbInfo->clear();
 
     state = file_test::TestOpuState::BEGIN;
     startTest.start(1000);
@@ -509,3 +537,12 @@ void FileTest::on_bStart_clicked()
 //}
 
 
+
+void FileTest::on_bStop_clicked()
+{
+    startTest.stop();
+    oneTest.stop();
+    ui->bStop->setEnabled(false);
+    ui->bStart->setEnabled(true);
+    ui->bOpenFile->setEnabled(true);
+}

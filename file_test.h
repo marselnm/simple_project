@@ -6,8 +6,8 @@
 
 #include "struct_cmd.h"
 
-#define AZ_SPEED 5
-#define EL_SPEED 5
+#define AZ_SPEED 1
+#define EL_SPEED 1
 
 namespace file_test {
 enum class TestOpuState
@@ -43,6 +43,8 @@ public:
     void closeEvent(QCloseEvent *event);
     void SendPosition(float AZ, float EL);
     void StopTests();
+    void PutInfoRUN_TEST(int currentTest);
+    void PutInfoOK_FALSE(int currentTest, int ok_or_false);
 
 public slots:
     void GetStatusFotTesting(QByteArray *AnsData);
@@ -59,6 +61,8 @@ private slots:
 
     void on_bStart_clicked();
     void read_status();
+
+    void on_bStop_clicked();
 
 signals:
     void GetStatus();
@@ -99,7 +103,6 @@ private:
     bool checkPosition = false;
 
     QTimer waitstartTimer;
-
     QTimer testTimer;
 
     void errorTest();
