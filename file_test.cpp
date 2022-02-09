@@ -27,6 +27,7 @@ void FileTest::closeEvent(QCloseEvent *event)
     Q_UNUSED(event);
     startTest.stop();
     oneTest.stop();
+    emit sigCheckBoxTrue();
 }
 
 void FileTest::SendPosition(float AZ, float EL)

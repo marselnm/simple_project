@@ -88,6 +88,8 @@ private slots:
 
     void SetPosition(QByteArray *position);
 
+    void ReturnCheckBoxTrue();
+
 private:
     Ui::MainWindow *ui;
     SettingsWrapper* settings_;

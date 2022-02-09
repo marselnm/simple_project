@@ -86,6 +86,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(test_from_file, &FileTest::GetStatus, this, &MainWindow::GetNewStatus);
     connect(this, SIGNAL(SendStatusFotTesting(QByteArray*)), test_from_file, SLOT(GetStatusFotTesting(QByteArray*)));
     connect(test_from_file, SIGNAL(sigSetPosition(QByteArray*)), this, SLOT(SetPosition(QByteArray*)));
+    connect(test_from_file, SIGNAL(sigCheckBoxTrue()), this, SLOT(ReturnCheckBoxTrue()));
 }
 
 MainWindow::~MainWindow()
@@ -872,6 +873,8 @@ void MainWindow::SendCmdReadStatusAuto()
 void MainWindow::on_test_from_file_triggered()
 {
     test_from_file->show();
+    ui->checkBox_6->setCheckState(Qt::Unchecked);
+    ui->checkBox_6->setEnabled(false);
 }
 
 void MainWindow::GetNewStatus()
@@ -911,6 +914,12 @@ void MainWindow::SetPosition(QByteArray *position)
             qDebug() << "Не удалось отправить";
         }
     }
+}
+
+void MainWindow::ReturnCheckBoxTrue()
+{
+    ui->checkBox_6->setCheckState(Qt::Unchecked);
+    ui->checkBox_6->setEnabled(true);
 }
 
 

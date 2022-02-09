@@ -67,6 +67,7 @@ private slots:
 signals:
     void GetStatus();
     void sigSetPosition(QByteArray *position);
+    void sigCheckBoxTrue();
 
 private:
     Ui::FileTest *ui;
