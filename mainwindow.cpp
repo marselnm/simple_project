@@ -92,6 +92,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(SendStatusFotTesting(QByteArray*)), test_from_file, SLOT(GetStatusFotTesting(QByteArray*)));
     connect(test_from_file, SIGNAL(sigSetPosition(QByteArray*)), this, SLOT(SetPosition(QByteArray*)));
     connect(test_from_file, SIGNAL(sigCheckBoxTrue()), this, SLOT(ReturnCheckBoxTrue()));
+    connect(test_from_file, SIGNAL(sig_stop_move_all_drives()), this, SLOT(slot_stop_move_all_drives()));
 }
 
 MainWindow::~MainWindow()
@@ -947,3 +948,43 @@ void MainWindow::on_pushButton_reset_error_clicked()
         }
     }
 }
+
+void MainWindow::slot_stop_move_all_drives()
+{
+    cmd_stop_moving_t cmd_stop_moving;
+    cmd_stop_moving.Lenght = sizeof (cmd_stop_moving_t);
+    cmd_stop_moving.Message_ID = CMD_STOP_MOVING;
+    cmd_stop_moving.Mask = 0x07;
+
+    if(1)//если связь была установлена
+    {
+        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_stop_moving), cmd_stop_moving.Lenght, HostAP, PortAP);
+
+        if(temp == cmd_stop_moving.Lenght)
+        {
+            PutCmdOnForm(reinterpret_cast<char*>(&cmd_stop_moving),  cmd_stop_moving.Lenght);
+            IncCountCMD();
+        }else {
+            qDebug() << "Не удалось отправить";
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

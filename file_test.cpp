@@ -12,6 +12,10 @@ FileTest::FileTest(QWidget *parent) :
     ui(new Ui::FileTest)
 {
     ui->setupUi(this);
+    az_speed = 1.0;
+    el_speed = 1.0;
+    ui->lineEdit->setText(QString::number(static_cast<double>(az_speed)));
+    ui->lineEdit_2->setText(QString::number(static_cast<double>(el_speed)));
 
     connect(&startTest, &QTimer::timeout, this, &FileTest::MainTest);
     connect(&oneTest, &QTimer::timeout, this, &FileTest::OneTest);
@@ -27,7 +31,9 @@ void FileTest::closeEvent(QCloseEvent *event)
     Q_UNUSED(event);
     startTest.stop();
     oneTest.stop();
+    ui->tbInfo->clear();
     emit sigCheckBoxTrue();
+    emit sig_stop_move_all_drives();
 }
 
 void FileTest::SendPosition(float AZ, float EL)
@@ -92,14 +98,25 @@ void FileTest::MainTest()
             int ErrorAZ = static_cast<int>(abs(cmd_ans_status_2.CurrentAZ - tests.at(currentTest).az));
             int ErrorEL = static_cast<int>(abs(cmd_ans_status_2.CurrentEL - tests.at(currentTest).el));
 
-            int time = 0;
+            int maxError = 0;
 
             if(ErrorAZ >= ErrorEL)
             {
-                time = ErrorAZ + 5;
+                maxError = ErrorAZ;
             }else {
-                time = ErrorEL + 5;
+                maxError = ErrorEL;
             }
+
+            int speed = 0;
+
+            if(az_speed >= el_speed)
+            {
+                speed = static_cast<int>(az_speed);
+            }else {
+                speed = static_cast<int>(el_speed);
+            }
+
+            int time = (maxError / speed) + 5;
 
             SendPosition(newAZ, newEL);
             state = file_test::TestOpuState::NOP;
@@ -265,33 +282,12 @@ void FileTest::on_bStart_clicked()
     currentTest = 0;
     ui->tbInfo->clear();
 
+    az_speed = ui->lineEdit->text().toFloat();
+    el_speed = ui->lineEdit_2->text().toFloat();
+
     state = file_test::TestOpuState::BEGIN;
     startTest.start(1000);
 }
-
-//void FileTest::on_bStop_clicked()
-//{
-//    restart();
-//}
-
-//void FileTest::startTest()
-//{
-//    statusTimer.start(500);
-
-//    ca_messages::in::StopMove command;
-//    ca_messages::Message message;
-//    message.append(reinterpret_cast<char*>(&command), ca_messages::sizeOfStopMove);
-//    emit messageReady(message);
-
-//    state = file_test::TestOpuState::WAIT_STOP_MOVE;
-
-//    startFlag = true;
-
-//    ui->tbInfo->clear();
-//    ui->lSuccess->setText("");
-//}
-
-
 
 void FileTest::on_bStop_clicked()
 {
@@ -300,4 +296,5 @@ void FileTest::on_bStop_clicked()
     ui->bStop->setEnabled(false);
     ui->bStart->setEnabled(true);
     ui->bOpenFile->setEnabled(true);
+    emit sig_stop_move_all_drives();
 }

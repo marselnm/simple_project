@@ -61,6 +61,7 @@ signals:
     void GetStatus();
     void sigSetPosition(QByteArray *position);
     void sigCheckBoxTrue();
+    void sig_stop_move_all_drives();
 
 private:
     Ui::FileTest *ui;
@@ -75,6 +76,8 @@ private:
     QTimer oneTest;
     int successTest;
     int falseTest;
+    float az_speed;
+    float el_speed;
 
     static constexpr float minAz = -180.;
     static constexpr float maxAz = 180.;

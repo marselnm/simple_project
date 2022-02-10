@@ -92,6 +92,8 @@ private slots:
 
     void on_pushButton_reset_error_clicked();
 
+    void slot_stop_move_all_drives();
+
 private:
     Ui::MainWindow *ui;
     SettingsWrapper* settings_;
