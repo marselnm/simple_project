@@ -43,9 +43,9 @@ void FileTest::SendPosition(float AZ, float EL)
     cmd_set_position_t cmd_set_position;
     cmd_set_position.Lenght = sizeof (cmd_set_position_t);
     cmd_set_position.Message_ID = CMD_SET_POSITION;
-    cmd_set_position.AZ_Speed = AZ_SPEED;
+    cmd_set_position.AZ_Speed = az_speed;
     cmd_set_position.AZ_Position = AZ;
-    cmd_set_position.EL_Speed = EL_SPEED;
+    cmd_set_position.EL_Speed = el_speed;
     cmd_set_position.EL_Position = EL;
 
     Buffer.append(reinterpret_cast<const char*>(&cmd_set_position), sizeof(cmd_set_position_t));
