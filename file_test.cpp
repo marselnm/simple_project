@@ -175,8 +175,8 @@ void FileTest::OneTest()
 {
     oneTest.stop();
 
-    int ErrorAZ = static_cast<int>(abs(cmd_ans_status_2.CurrentAZ - tests.at(currentTest).az));
-    int ErrorEL = static_cast<int>(abs(cmd_ans_status_2.CurrentEL - tests.at(currentTest).el));
+    double ErrorAZ = fabs(static_cast<double>(cmd_ans_status_2.CurrentAZ - tests.at(currentTest).az));
+    double ErrorEL = fabs(static_cast<double>(cmd_ans_status_2.CurrentEL - tests.at(currentTest).el));
 
     if(ErrorAZ <= 0.3 && ErrorEL <= 0.3)
     {
