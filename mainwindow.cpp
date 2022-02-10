@@ -71,6 +71,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBox_ram_or_flash->addItem("ПЗУ");
     ui->comboBox_ram_or_flash->addItem("ОЗУ");
 
+    //заполнение QComboBox для сброса ошибок привода
+    ui->comboBox->addItem("AZ");
+    ui->comboBox->addItem("EL");
+    ui->comboBox->addItem("POL");
+
     //настройка таймера для обнослений
     timeupdate = new QTimer();
     timeupdate->setInterval(1000);
@@ -922,10 +927,23 @@ void MainWindow::ReturnCheckBoxTrue()
     ui->checkBox_6->setEnabled(true);
 }
 
+void MainWindow::on_pushButton_reset_error_clicked()
+{
+    cmd_reset_error_servo_t cmd_reset_error_servo;
+    cmd_reset_error_servo.Lenght = sizeof (cmd_reset_error_servo_t);
+    cmd_reset_error_servo.Message_ID = CMD_RESET_ERROR_SERVO;
+    cmd_reset_error_servo.Axis = static_cast<uint8_t>(ui->comboBox->currentIndex() + 1);
 
+    if(1)//если связь была установлена
+    {
+        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_reset_error_servo), cmd_reset_error_servo.Lenght, HostAP, PortAP);
 
-
-
-
-
-
+        if(temp == cmd_reset_error_servo.Lenght)
+        {
+            PutCmdOnForm(reinterpret_cast<char*>(&cmd_reset_error_servo),  cmd_reset_error_servo.Lenght);
+            IncCountCMD();
+        }else {
+            qDebug() << "Не удалось отправить";
+        }
+    }
+}

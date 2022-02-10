@@ -90,6 +90,8 @@ private slots:
 
     void ReturnCheckBoxTrue();
 
+    void on_pushButton_reset_error_clicked();
+
 private:
     Ui::MainWindow *ui;
     SettingsWrapper* settings_;

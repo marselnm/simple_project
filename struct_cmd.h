@@ -22,6 +22,7 @@
 #define CMD_GET_NETPARAMS 0x04//Получить настройки сети
 #define CMD_ANS_STATUS 0x8A//Идентификатор ответа на команду CMD_READ_STATUS
 #define CMD_ANS_NETPARAMS 0x82//Идентификатор от вета на команду CMD_GET_NETPARAMS
+#define CMD_RESET_ERROR_SERVO 0x4A//Сбросить все ошибки привода
 
 #pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_set_position
@@ -211,6 +212,15 @@ typedef struct  __attribute__((packed)) cmd_ans_netparams
     uint32_t Netmask;
     uint32_t IPdevice;
 } cmd_ans_netparams_t;
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+typedef struct  __attribute__((packed)) cmd_reset_error_servo
+{
+    uint16_t Lenght;
+    uint8_t Message_ID;
+    uint8_t Axis;
+} cmd_reset_error_servo_t;
 #pragma pack(pop)
 
 
