@@ -76,6 +76,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBox->addItem("EL");
     ui->comboBox->addItem("POL");
 
+    //заполнение QComboBox для ограничения момента
+    ui->comboBox_2->addItem("AZ");
+    ui->comboBox_2->addItem("EL");
+    ui->comboBox_2->addItem("POL");
+
     //настройка таймера для обнослений
     timeupdate = new QTimer();
     timeupdate->setInterval(1000);
@@ -970,11 +975,27 @@ void MainWindow::slot_stop_move_all_drives()
     }
 }
 
+void MainWindow::on_pushButton_set_moment_clicked()
+{
+    cmd_set_torque_servo_t cmd_set_torque_servo;
+    cmd_set_torque_servo.Lenght = sizeof (cmd_set_torque_servo_t);
+    cmd_set_torque_servo.Message_ID = CMD_SET_TORQUE_LIMIT;
+    cmd_set_torque_servo.Axis = static_cast<uint8_t>(ui->comboBox_2->currentIndex() + 1);
+    cmd_set_torque_servo.Moment = static_cast<uint8_t>(ui->lineEdit_14->text().toUInt());
 
+    if(1)//если связь была установлена
+    {
+        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_torque_servo), cmd_set_torque_servo.Lenght, HostAP, PortAP);
 
-
-
-
+        if(temp == cmd_set_torque_servo.Lenght)
+        {
+            PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_torque_servo),  cmd_set_torque_servo.Lenght);
+            IncCountCMD();
+        }else {
+            qDebug() << "Не удалось отправить";
+        }
+    }
+}
 
 
 

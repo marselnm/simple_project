@@ -23,6 +23,7 @@
 #define CMD_ANS_STATUS 0x8A//Идентификатор ответа на команду CMD_READ_STATUS
 #define CMD_ANS_NETPARAMS 0x82//Идентификатор от вета на команду CMD_GET_NETPARAMS
 #define CMD_RESET_ERROR_SERVO 0x4A//Сбросить все ошибки привода
+#define CMD_SET_TORQUE_LIMIT 0x4B//Задать момент
 
 #pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_set_position
@@ -223,6 +224,15 @@ typedef struct  __attribute__((packed)) cmd_reset_error_servo
 } cmd_reset_error_servo_t;
 #pragma pack(pop)
 
+#pragma pack(push, 1)
+typedef struct  __attribute__((packed)) cmd_set_torque_servo
+{
+    uint16_t Lenght;
+    uint8_t Message_ID;
+    uint8_t Axis;
+    uint8_t Moment;//Число типа uint8_t в диапазоне 0…100(%)
+} cmd_set_torque_servo_t;
+#pragma pack(pop)
 
 #endif // SCTRUCT_CMD_H
 
