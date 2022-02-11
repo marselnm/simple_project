@@ -21,6 +21,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void SendDataToOPU(char *data, int size);
+    void CmdReadStatus();
     void PutCmdOnForm(char *data, int size);
     void PutAnsOnForm(char *data, int size);
     void IncCountCMD();

@@ -21,6 +21,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     opu_socket = new QUdpSocket();
 
+    //по умолчанию управлени от ЭВМ
+    ui->checkBox_2->setCheckState(Qt::Checked);
+
     //заполнение QComboBox для коррекции положения
     ui->comboBox_cor_pos->addItem("AZ");
     ui->comboBox_cor_pos->addItem("EL");
@@ -106,6 +109,30 @@ MainWindow::~MainWindow()
     settings.save(); // сохраняем значения QSpinBox и QLineEdit
     timeupdate->stop();
     delete ui;
+}
+
+void MainWindow::SendDataToOPU(char *data, int size)
+{
+    if(1)//если связь была установлена
+    {
+        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(data), size, HostAP, PortAP);
+
+        if(temp == size)
+        {
+            PutCmdOnForm(data,  size);
+            IncCountCMD();
+        }else {
+            qDebug() << "Не удалось отправить";
+        }
+    }
+}
+
+void MainWindow::CmdReadStatus()
+{
+    cmd_simple_t cmd_simple;
+    cmd_simple.Lenght = sizeof (cmd_simple_t);
+    cmd_simple.Message_ID = CMD_READ_STATUS;
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_simple), cmd_simple.Lenght);
 }
 
 void MainWindow::PutCmdOnForm(char *data, int size)
@@ -392,18 +419,7 @@ void MainWindow::on_pushButton_ret_az_el_clicked()
     cmd_set_position.EL_Speed = ui->lineEdit_7->text().toFloat();
     cmd_set_position.EL_Position = ui->lineEdit_8->text().toFloat();
 
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_position), cmd_set_position.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_set_position.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_position),  cmd_set_position.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_set_position), cmd_set_position.Lenght);
 }
 
 void MainWindow::on_pushButton_set_dev_clicked()
@@ -428,17 +444,9 @@ void MainWindow::on_pushButton_set_dev_clicked()
         qDebug() << "Устройство не выбрано";
     }
 
-    if(cmd_set_cntrl_dev.Device_ID != -1 && 1)//добавить проверку установки связи
+    if(cmd_set_cntrl_dev.Device_ID != -1)//добавить проверку установки связи
     {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_cntrl_dev), cmd_set_cntrl_dev.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_set_cntrl_dev.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_cntrl_dev),  cmd_set_cntrl_dev.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
+        SendDataToOPU(reinterpret_cast<char*>(&cmd_set_cntrl_dev),  cmd_set_cntrl_dev.Lenght);
     }
 }
 
@@ -448,18 +456,7 @@ void MainWindow::on_pushButton_reset_dev_clicked()
     cmd_simple.Lenght = sizeof (cmd_simple_t);
     cmd_simple.Message_ID = CMD_RESET_DEV;
 
-    if(1)//если связь была установлена
-    {         
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_simple), cmd_simple.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_simple.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
 }
 
 void MainWindow::on_pushButton_stop_clicked()
@@ -486,15 +483,7 @@ void MainWindow::on_pushButton_stop_clicked()
 
     if(1 && cmd_stop_moving.Mask != 0)//если связь была установлена
     {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_stop_moving), cmd_stop_moving.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_stop_moving.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_stop_moving),  cmd_stop_moving.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
+        SendDataToOPU(reinterpret_cast<char*>(&cmd_stop_moving),  cmd_stop_moving.Lenght);
     }
 }
 
@@ -506,18 +495,7 @@ void MainWindow::on_pushButton_new_pos_clicked()
     cmd_adjust_pos_sensor.Axis = static_cast<uint8_t>(ui->comboBox_cor_pos->currentIndex() + 1);
     cmd_adjust_pos_sensor.Position = ui->lineEdit_3->text().toFloat();
 
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_adjust_pos_sensor), cmd_adjust_pos_sensor.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_adjust_pos_sensor.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_adjust_pos_sensor),  cmd_adjust_pos_sensor.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_adjust_pos_sensor),  cmd_adjust_pos_sensor.Lenght);
 }
 
 void MainWindow::on_pushButton_move_park_clicked()
@@ -528,18 +506,7 @@ void MainWindow::on_pushButton_move_park_clicked()
     cmd_move_park_position.AZ_Speed = ui->lineEdit_4->text().toFloat();
     cmd_move_park_position.EL_Speed = ui->lineEdit_9->text().toFloat();
 
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_move_park_position), cmd_move_park_position.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_move_park_position.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_move_park_position),  cmd_move_park_position.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_move_park_position),  cmd_move_park_position.Lenght);
 }
 
 
@@ -550,18 +517,7 @@ void MainWindow::on_pushButton_made_park_pos_clicked()
     cmd_adjust_park_position.Message_ID = CMD_ADJUST_PARK_POSITION;
     cmd_adjust_park_position.Axis = static_cast<uint8_t>(ui->comboBox_park_pos->currentIndex() + 1);
 
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_adjust_park_position), cmd_adjust_park_position.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_adjust_park_position.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_adjust_park_position),  cmd_adjust_park_position.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_adjust_park_position),  cmd_adjust_park_position.Lenght);
 }
 
 void MainWindow::on_pushButton_relay_clicked()
@@ -572,18 +528,7 @@ void MainWindow::on_pushButton_relay_clicked()
     cmd_set_relay_state.RelayNum = static_cast<uint8_t>(ui->comboBox_relay->currentIndex() + 1);
     cmd_set_relay_state.RelayState = static_cast<uint8_t>(ui->comboBox_state_relay->currentIndex());
 
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_relay_state), cmd_set_relay_state.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_set_relay_state.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_relay_state),  cmd_set_relay_state.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_set_relay_state),  cmd_set_relay_state.Lenght);
 }
 
 void MainWindow::on_pushButton_test_clicked()
@@ -593,18 +538,7 @@ void MainWindow::on_pushButton_test_clicked()
     cmd_test_servo_connection.Message_ID = CMD_TEST_SERVO_CONNECTION;
     cmd_test_servo_connection.TypeOfTest = static_cast<uint8_t>(ui->comboBox_test->currentIndex() + 1);
 
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_test_servo_connection), cmd_test_servo_connection.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_test_servo_connection.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_test_servo_connection),  cmd_test_servo_connection.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_test_servo_connection),  cmd_test_servo_connection.Lenght);
 }
 
 void MainWindow::on_pushButton_set_servo_mode_clicked()
@@ -618,38 +552,12 @@ void MainWindow::on_pushButton_set_servo_mode_clicked()
     cmd_set_servo_work_mode.Mode_Brake = static_cast<uint8_t>(ui->comboBox_brake_auto->currentIndex());
     cmd_set_servo_work_mode.Mode_Error = static_cast<uint8_t>(ui->lineEdit_10->text().toInt());
 
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_servo_work_mode), cmd_set_servo_work_mode.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_set_servo_work_mode.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_servo_work_mode),  cmd_set_servo_work_mode.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_set_servo_work_mode),  cmd_set_servo_work_mode.Lenght);
 }
 
 void MainWindow::on_pushButton_status_clicked()
 {
-    cmd_read_status_t cmd_read_status;
-    cmd_read_status.Lenght = sizeof (cmd_read_status_t);
-    cmd_read_status.Message_ID = CMD_READ_STATUS;
-
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_read_status), cmd_read_status.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_read_status.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_read_status),  cmd_read_status.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    CmdReadStatus();
 }
 
 void MainWindow::on_checkBox_stateChanged(int arg1)
@@ -657,11 +565,6 @@ void MainWindow::on_checkBox_stateChanged(int arg1)
     if(arg1 == 2)
     {
         ui->checkBox_2->setCheckState(Qt::Unchecked);
-        ui->checkBox_2->setCheckable(false);
-    }else
-    {
-        ui->checkBox_2->setCheckState(Qt::Unchecked);
-        ui->checkBox_2->setCheckable(true);
     }
 }
 
@@ -670,11 +573,6 @@ void MainWindow::on_checkBox_2_stateChanged(int arg1)
     if(arg1 == 2)
     {
         ui->checkBox->setCheckState(Qt::Unchecked);
-        ui->checkBox->setCheckable(false);
-    }else
-    {
-        ui->checkBox->setCheckState(Qt::Unchecked);
-        ui->checkBox->setCheckable(true);
     }
 }
 
@@ -706,18 +604,7 @@ void MainWindow::on_pushButton_get_dev_info_clicked()
     cmd_simple.Lenght = sizeof (cmd_simple_t);
     cmd_simple.Message_ID = CMD_GET_DEVICE_INFO;
 
-    if(1)
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_simple), cmd_simple.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_simple.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
 }
 
 void MainWindow::on_pushButton_get_mac_clicked()
@@ -726,18 +613,7 @@ void MainWindow::on_pushButton_get_mac_clicked()
     cmd_simple.Lenght = sizeof (cmd_simple_t);
     cmd_simple.Message_ID = CMD_GET_MAC_ADDRESS;
 
-    if(1)
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_simple), cmd_simple.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_simple.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
 }
 
 void MainWindow::on_pushButton_get_netparam_clicked()
@@ -746,18 +622,7 @@ void MainWindow::on_pushButton_get_netparam_clicked()
     cmd_simple.Lenght = sizeof (cmd_simple_t);
     cmd_simple.Message_ID = CMD_GET_NETPARAMS;
 
-    if(1)
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_simple), cmd_simple.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_simple.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_simple),  cmd_simple.Lenght);
 }
 
 void MainWindow::on_pushButton_change_netparam_clicked()
@@ -777,18 +642,7 @@ void MainWindow::on_pushButton_change_netparam_clicked()
         cmd_change_netparams.RAMofFlash = 0xFF;
     }
 
-    if(1)
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_change_netparams), cmd_change_netparams.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_change_netparams.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_change_netparams),  cmd_change_netparams.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_change_netparams),  cmd_change_netparams.Lenght);
 }
 
 void MainWindow::on_pushButton_connect_clicked()
@@ -863,22 +717,7 @@ void MainWindow::on_checkBox_6_stateChanged(int arg1)
 
 void MainWindow::SendCmdReadStatusAuto()
 {
-    cmd_read_status_t cmd_read_status;
-    cmd_read_status.Lenght = sizeof (cmd_read_status_t);
-    cmd_read_status.Message_ID = CMD_READ_STATUS;
-
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_read_status), cmd_read_status.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_read_status.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_read_status),  cmd_read_status.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    CmdReadStatus();
 }
 
 void MainWindow::on_test_from_file_triggered()
@@ -890,22 +729,7 @@ void MainWindow::on_test_from_file_triggered()
 
 void MainWindow::GetNewStatus()
 {
-    cmd_read_status_t cmd_read_status;
-    cmd_read_status.Lenght = sizeof (cmd_read_status_t);
-    cmd_read_status.Message_ID = CMD_READ_STATUS;
-
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_read_status), cmd_read_status.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_read_status.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_read_status),  cmd_read_status.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    CmdReadStatus();
 }
 
 void MainWindow::SetPosition(QByteArray *position)
@@ -913,18 +737,7 @@ void MainWindow::SetPosition(QByteArray *position)
     cmd_set_position_t cmd_set_position;
     memcpy(reinterpret_cast<char*>(&cmd_set_position), position->data(), sizeof(cmd_set_position_t));
 
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_position), cmd_set_position.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_set_position.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_position),  cmd_set_position.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_set_position),  cmd_set_position.Lenght);
 }
 
 void MainWindow::ReturnCheckBoxTrue()
@@ -940,18 +753,7 @@ void MainWindow::on_pushButton_reset_error_clicked()
     cmd_reset_error_servo.Message_ID = CMD_RESET_ERROR_SERVO;
     cmd_reset_error_servo.Axis = static_cast<uint8_t>(ui->comboBox->currentIndex() + 1);
 
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_reset_error_servo), cmd_reset_error_servo.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_reset_error_servo.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_reset_error_servo),  cmd_reset_error_servo.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_reset_error_servo),  cmd_reset_error_servo.Lenght);
 }
 
 void MainWindow::slot_stop_move_all_drives()
@@ -961,18 +763,7 @@ void MainWindow::slot_stop_move_all_drives()
     cmd_stop_moving.Message_ID = CMD_STOP_MOVING;
     cmd_stop_moving.Mask = 0x07;
 
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_stop_moving), cmd_stop_moving.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_stop_moving.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_stop_moving),  cmd_stop_moving.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_stop_moving),  cmd_stop_moving.Lenght);
 }
 
 void MainWindow::on_pushButton_set_moment_clicked()
@@ -983,18 +774,7 @@ void MainWindow::on_pushButton_set_moment_clicked()
     cmd_set_torque_servo.Axis = static_cast<uint8_t>(ui->comboBox_2->currentIndex() + 1);
     cmd_set_torque_servo.Moment = static_cast<uint8_t>(ui->lineEdit_14->text().toUInt());
 
-    if(1)//если связь была установлена
-    {
-        qint64 temp = opu_socket->writeDatagram(reinterpret_cast<const char*>(&cmd_set_torque_servo), cmd_set_torque_servo.Lenght, HostAP, PortAP);
-
-        if(temp == cmd_set_torque_servo.Lenght)
-        {
-            PutCmdOnForm(reinterpret_cast<char*>(&cmd_set_torque_servo),  cmd_set_torque_servo.Lenght);
-            IncCountCMD();
-        }else {
-            qDebug() << "Не удалось отправить";
-        }
-    }
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_set_torque_servo),  cmd_set_torque_servo.Lenght);
 }
 
 

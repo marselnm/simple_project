@@ -35,27 +35,21 @@ typedef struct  __attribute__((packed)) cmd_set_position
     float EL_Speed;
     float EL_Position;
 } cmd_set_position_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_set_cntrl_dev
 {
     uint16_t Lenght;
     uint8_t Message_ID;
     int8_t Device_ID;
 } cmd_set_cntrl_dev_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_stop_moving
 {
     uint16_t Lenght;
     uint8_t Message_ID;
     uint8_t Mask;       //1 бит - стоп по AZ, 2 бит - стоп по EL, 3 бит - стоп по POL,
 } cmd_stop_moving_t;    //пример: 0x01 – остановка по азимуту, 0x02 – по углу места, 0x07 – по всем трем
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_adjust_pos_sensor
 {
     uint16_t Lenght;
@@ -63,9 +57,7 @@ typedef struct  __attribute__((packed)) cmd_adjust_pos_sensor
     uint8_t Axis;
     float Position;
 } cmd_adjust_pos_sensor_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_move_park_position
 {
     uint16_t Lenght;
@@ -73,18 +65,14 @@ typedef struct  __attribute__((packed)) cmd_move_park_position
     float AZ_Speed;
     float EL_Speed;
 } cmd_move_park_position_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_adjust_park_position
 {
     uint16_t Lenght;
     uint8_t Message_ID;
     uint8_t Axis;
 } cmd_adjust_park_position_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_set_relay_state
 {
     uint16_t Lenght;
@@ -92,18 +80,14 @@ typedef struct  __attribute__((packed)) cmd_set_relay_state
     uint8_t RelayNum;
     uint8_t RelayState;
 } cmd_set_relay_state_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_test_servo_connection
 {
     uint16_t Lenght;
     uint8_t Message_ID;
     uint8_t TypeOfTest;
 } cmd_test_servo_connection_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_set_servo_work_mode
 {
     uint16_t Lenght;
@@ -114,25 +98,13 @@ typedef struct  __attribute__((packed)) cmd_set_servo_work_mode
     uint8_t Mode_Brake;
     uint8_t Mode_Error;
 } cmd_set_servo_work_mode_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
-typedef struct  __attribute__((packed)) cmd_read_status
-{
-    uint16_t Lenght;
-    uint8_t Message_ID;
-} cmd_read_status_t;
-#pragma pack(pop)
-
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_simple
 {
     uint16_t Lenght;
     uint8_t Message_ID;
 } cmd_simple_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_change_netparams
 {
     uint16_t Lenght;
@@ -142,9 +114,7 @@ typedef struct  __attribute__((packed)) cmd_change_netparams
     uint32_t IPdevice;
     uint8_t  RAMofFlash;
 } cmd_change_netparams_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_ans_status
 {
     uint16_t Lenght;
@@ -202,9 +172,7 @@ typedef struct  __attribute__((packed)) cmd_ans_status
     uint8_t CountErrorAnsDrPOL;
     uint8_t CountMissedAnsDrPOL;
 } cmd_ans_status_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_ans_netparams
 {
     uint16_t Lenght;
@@ -213,18 +181,14 @@ typedef struct  __attribute__((packed)) cmd_ans_netparams
     uint32_t Netmask;
     uint32_t IPdevice;
 } cmd_ans_netparams_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_reset_error_servo
 {
     uint16_t Lenght;
     uint8_t Message_ID;
     uint8_t Axis;
 } cmd_reset_error_servo_t;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct  __attribute__((packed)) cmd_set_torque_servo
 {
     uint16_t Lenght;
