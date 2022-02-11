@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include <QTimer>
+#include <QFile>
+#include <QSettings>
 
 #include "struct_cmd.h"
 

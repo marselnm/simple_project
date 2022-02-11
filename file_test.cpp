@@ -188,9 +188,21 @@ void FileTest::OneTest()
 
 void FileTest::on_bOpenFile_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(nullptr, "Выбрать файл тестов", QDir::homePath(), "*.csv");
-    ui->leFileName->setText(fileName);
+    //Чтение данныx о директории из файла
+    QSettings settings ("config.ini", QSettings::IniFormat);
+    settings.beginGroup("Settings");
+    QString path = settings.value("path", QString(QDir::homePath())).toString();
+    settings.endGroup();
 
+    QString fileName = QFileDialog::getOpenFileName(nullptr, "Выбрать файл тестов", path, "*.csv");
+    QString name = fileName;
+    int pos = fileName.lastIndexOf(QChar('/'));
+
+    settings.beginGroup("Settings");
+    settings.setValue( "path", name.left(pos));
+    settings.endGroup();
+
+    ui->leFileName->setText(fileName);
     if(fileName.isEmpty())
         return;
 
