@@ -98,6 +98,8 @@ private slots:
 
     void on_pushButton_set_moment_clicked();
 
+    void slot_reset_error_drive(int NumDrive);
+
 private:
     Ui::MainWindow *ui;
     SettingsWrapper* settings_;

@@ -14,6 +14,8 @@ FileTest::FileTest(QWidget *parent) :
     ui->setupUi(this);
     az_speed = 1.0;
     el_speed = 1.0;
+    ErorrMomAZ = 0;//ошибки нет
+    ErorrMomEL = 0;//ошибки нет
     ui->lineEdit->setText(QString::number(static_cast<double>(az_speed)));
     ui->lineEdit_2->setText(QString::number(static_cast<double>(el_speed)));
 
@@ -75,6 +77,23 @@ void FileTest::PutInfoOK_FALSE(int currentTest, int ok_or_false)
         ui->tbInfo->append("Тест " + QString::number(currentTest+1) + "<font color='green'> выполнен успешно");
     }else {
         ui->tbInfo->append("Тест " + QString::number(currentTest+1) + "<font color='red'> не выполнен ");
+    }
+}
+
+void FileTest::PutInfoErorrMomAndReset(int ErorrMomAZ, int ErorrMomEL)
+{
+    if(ErorrMomAZ == 1)
+    {
+        ui->tbInfo->append("<font color='red'> Ошибка момента AZ, уже сброшена");
+        emit sig_reset_error_drive(0x01);
+        ErorrMomAZ = 0;
+    }
+
+    if(ErorrMomEL == 1)
+    {
+        ui->tbInfo->append("<font color='red'> Ошибка момента EL, уже сброшена");
+        emit sig_reset_error_drive(0x02);
+        ErorrMomEL = 0;
     }
 }
 
@@ -144,6 +163,7 @@ void FileTest::MainTest()
         case file_test::TestOpuState::TEST_FALSE:
         {
             PutInfoOK_FALSE(currentTest, 0);
+            PutInfoErorrMomAndReset(ErorrMomAZ, ErorrMomEL);//если есть ошибка, то отобразить и отправить команду на сброс
             currentTest++;
             falseTest++;
 
@@ -182,6 +202,18 @@ void FileTest::OneTest()
     {
         state = file_test::TestOpuState::TEST_OK;
     }else {
+        state = file_test::TestOpuState::TEST_FALSE;
+    }
+
+    if((cmd_ans_status_2.ErrosCodeAZ & 0x00FF) == 0x52)//если есть ошибка по моменту AZ
+    {
+        ErorrMomAZ = 1;
+        state = file_test::TestOpuState::TEST_FALSE;
+    }
+
+    if((cmd_ans_status_2.ErrosCodeEL & 0x00FF) == 0x52)//если есть ошибка по моменту EL
+    {
+        ErorrMomEL = 1;
         state = file_test::TestOpuState::TEST_FALSE;
     }
 }

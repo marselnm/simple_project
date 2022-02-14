@@ -101,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(test_from_file, SIGNAL(sigSetPosition(QByteArray*)), this, SLOT(SetPosition(QByteArray*)));
     connect(test_from_file, SIGNAL(sigCheckBoxTrue()), this, SLOT(ReturnCheckBoxTrue()));
     connect(test_from_file, SIGNAL(sig_stop_move_all_drives()), this, SLOT(slot_stop_move_all_drives()));
+    connect(test_from_file, SIGNAL(sig_reset_error_drive(int)), this, SLOT(slot_reset_error_drive(int)));
 }
 
 MainWindow::~MainWindow()
@@ -775,6 +776,16 @@ void MainWindow::on_pushButton_set_moment_clicked()
     cmd_set_torque_servo.Moment = static_cast<uint8_t>(ui->lineEdit_14->text().toUInt());
 
     SendDataToOPU(reinterpret_cast<char*>(&cmd_set_torque_servo),  cmd_set_torque_servo.Lenght);
+}
+
+void MainWindow::slot_reset_error_drive(int NumDrive)
+{
+    cmd_reset_error_servo_t cmd_reset_error_servo;
+    cmd_reset_error_servo.Lenght = sizeof (cmd_reset_error_servo_t);
+    cmd_reset_error_servo.Message_ID = CMD_RESET_ERROR_SERVO;
+    cmd_reset_error_servo.Axis = static_cast<uint8_t>(NumDrive);
+
+    SendDataToOPU(reinterpret_cast<char*>(&cmd_reset_error_servo),  cmd_reset_error_servo.Lenght);
 }
 
 

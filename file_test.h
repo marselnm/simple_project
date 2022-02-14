@@ -46,6 +46,7 @@ public:
     void StopTests();
     void PutInfoRUN_TEST(int currentTest);
     void PutInfoOK_FALSE(int currentTest, int ok_or_false);
+    void PutInfoErorrMomAndReset(int ErorrMomAZ, int ErorrMomEL);
 
 public slots:
     void GetStatusFotTesting(QByteArray *AnsData);
@@ -63,6 +64,7 @@ signals:
     void sigSetPosition(QByteArray *position);
     void sigCheckBoxTrue();
     void sig_stop_move_all_drives();
+    void sig_reset_error_drive(int NumDrive);
 
 private:
     Ui::FileTest *ui;
@@ -79,6 +81,8 @@ private:
     int falseTest;
     float az_speed;
     float el_speed;
+    int ErorrMomAZ;
+    int ErorrMomEL;
 
     static constexpr float minAz = -180.;
     static constexpr float maxAz = 180.;
